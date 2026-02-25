@@ -26,8 +26,8 @@ model Product {
   description String   @default("")
   price       Float
   category    String   // chaîne, bracelet, bague
-  colors      Json     // ["argent", "doré"]
-  sizes       Json     // ["40 cm", "45 cm", "50 cm"]
+  colors      String[]  // ["argent", "doré"]
+  sizes       String[]  // ["40 cm", "45 cm", "50 cm"]
   stock       Int      @default(0)
   images      Json     // {"argent": ["url1", "url2"], "doré": ["url1", "url2"]}
   packagingImage String? // URL de l'image du packaging
