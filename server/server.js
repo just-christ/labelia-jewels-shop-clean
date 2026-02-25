@@ -47,6 +47,57 @@ async function initializeDatabase() {
     await prisma.$connect();
     console.log('✅ Database connected successfully');
 
+    // Create tables if they don't exist (using raw SQL for PostgreSQL)
+    try {
+      // Create users table
+      await prisma.$executeRaw`
+        CREATE TABLE IF NOT EXISTS users (
+          id TEXT PRIMARY KEY,
+          email TEXT UNIQUE NOT NULL,
+          password TEXT NOT NULL,
+          role TEXT DEFAULT 'user',
+          "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `;
+      
+      // Create products table
+      await prisma.$executeRaw`
+        CREATE TABLE IF NOT EXISTS products (
+          id TEXT PRIMARY KEY,
+          name TEXT NOT NULL,
+          description TEXT NOT NULL,
+          price INTEGER NOT NULL,
+          category TEXT NOT NULL,
+          colors TEXT[],
+          sizes TEXT[],
+          stock INTEGER NOT NULL,
+          images JSONB DEFAULT '[]',
+          "packagingImage" TEXT,
+          "videoUrl" TEXT,
+          "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `;
+      
+      // Create orders table
+      await prisma.$executeRaw`
+        CREATE TABLE IF NOT EXISTS orders (
+          id TEXT PRIMARY KEY,
+          "userId" TEXT,
+          status TEXT DEFAULT 'pending',
+          total INTEGER NOT NULL,
+          items JSONB NOT NULL,
+          "shippingAddress" JSONB,
+          "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `;
+      
+      console.log('✅ Tables created successfully');
+    } catch (error) {
+      console.log('⚠️ Tables might already exist:', error.message);
+    }
+
     // Check if admin user exists
     const adminUser = await prisma.user.findUnique({
       where: { email: 'admin@labelia.fr' }
