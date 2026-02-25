@@ -40,13 +40,7 @@ app.get('/api/health', (req, res) => {
 
 // Initialize database and create admin user
 async function initializeDatabase() {
-  const prisma = new PrismaClient({
-    datasources: {
-      db: {
-        url: `mysql://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT || 3306}/${process.env.DB_NAME}`
-      }
-    }
-  });
+  const prisma = new PrismaClient();
   
   try {
     // Connect to database
