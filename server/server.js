@@ -118,21 +118,25 @@ async function initializeDatabase() {
 
     // Check if products exist, if not create sample products
     const productCount = await prisma.product.count();
-    if (productCount === 0) {
-      console.log('🌱 Creating sample products...');
-      
-      // Insert products using raw SQL to avoid JSON format issues
-      await prisma.$executeRaw`
-        INSERT INTO products (id, name, description, price, category, colors, sizes, stock, images, "createdAt", "updatedAt")
+    if (productCount > 0) {
+      console.log('🗑️ Deleting existing products with wrong types...');
+      await prisma.$executeRaw`DELETE FROM products`;
+      console.log('✅ Existing products deleted');
+    }
+    
+    console.log('🌱 Creating sample products...');
+    
+    // Insert products using raw SQL to avoid JSON format issues
+    await prisma.$executeRaw`
+      INSERT INTO products (id, name, description, price, category, colors, sizes, stock, images, "createdAt", "updatedAt")
         VALUES 
-          ('prod-1', 'Colonne Lumineuse', 'Une colonne élégante qui capte la lumière', 89, 'collier', ARRAY['argent'], ARRAY['40 cm', '45 cm', '50 cm'], 25, '[]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+          ('prod-1', 'Colonne Lumineuse', 'Une colonne élégante qui capte la lumière', 89, 'colonne', ARRAY['argent'], ARRAY['40 cm', '45 cm', '50 cm'], 25, '[]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
           ('prod-2', 'Bracelet Rosée', 'Un bracelet fin et raffiné, parfait pour sublimer votre poignet', 39, 'bracelet', ARRAY['argent', 'doré'], ARRAY['16 cm', '18 cm', '20 cm'], 22, '[]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
           ('prod-3', 'Bague Sérénité', 'Bague fine et épurée, un bijou essentiel pour chaque jour', 35, 'bague', ARRAY['argent', 'doré'], ARRAY['48', '50', '52', '54', '56'], 28, '[]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
         ON CONFLICT (id) DO NOTHING
       `;
       
       console.log('✅ Sample products created');
-    }
 
   } catch (error) {
     console.error('❌ Database initialization error:', error);
