@@ -119,42 +119,18 @@ async function initializeDatabase() {
     // Check if products exist, if not create sample products
     const productCount = await prisma.product.count();
     if (productCount === 0) {
-      const sampleProducts = [
-        {
-          name: 'Chaîne Éclat',
-          description: 'Une chaîne fine et délicate, parfaite pour un look épuré au quotidien.',
-          price: 49,
-          category: 'chaîne',
-          colors: ['argent', 'doré'],
-          sizes: ['40 cm', '45 cm', '50 cm'],
-          stock: 25,
-          images: []
-        },
-        {
-          name: 'Bracelet Rosée',
-          description: 'Un bracelet fin et raffiné, parfait pour sublimer votre poignet.',
-          price: 39,
-          category: 'bracelet',
-          colors: ['argent', 'doré'],
-          sizes: ['16 cm', '18 cm', '20 cm'],
-          stock: 22,
-          images: []
-        },
-        {
-          name: 'Bague Sérénité',
-          description: 'Bague fine et épurée, un bijou essentiel pour chaque jour.',
-          price: 35,
-          category: 'bague',
-          colors: ['argent', 'doré'],
-          sizes: ['48', '50', '52', '54', '56'],
-          stock: 28,
-          images: []
-        }
-      ];
-
-      await prisma.product.createMany({
-        data: sampleProducts
-      });
+      console.log('🌱 Creating sample products...');
+      
+      // Insert products using raw SQL to avoid JSON format issues
+      await prisma.$executeRaw`
+        INSERT INTO products (id, name, description, price, category, colors, sizes, stock, images, "createdAt", "updatedAt")
+        VALUES 
+          ('prod-1', 'Colonne Lumineuse', 'Une colonne élégante qui capte la lumière', 89, 'collier', ARRAY['argent'], ARRAY['40 cm', '45 cm', '50 cm'], 25, '[]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+          ('prod-2', 'Bracelet Rosée', 'Un bracelet fin et raffiné, parfait pour sublimer votre poignet', 39, 'bracelet', ARRAY['argent', 'doré'], ARRAY['16 cm', '18 cm', '20 cm'], 22, '[]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+          ('prod-3', 'Bague Sérénité', 'Bague fine et épurée, un bijou essentiel pour chaque jour', 35, 'bague', ARRAY['argent', 'doré'], ARRAY['48', '50', '52', '54', '56'], 28, '[]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        ON CONFLICT (id) DO NOTHING
+      `;
+      
       console.log('✅ Sample products created');
     }
 
