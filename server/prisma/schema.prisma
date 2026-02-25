@@ -1,0 +1,55 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  role      String   @default("user")
+  createdAt DateTime @default(now())
+  
+  @@map("users")
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  description String   @default("")
+  price       Float
+  category    String   // chaîne, bracelet, bague
+  colors      Json     // ["argent", "doré"]
+  sizes       Json     // ["40 cm", "45 cm", "50 cm"]
+  stock       Int      @default(0)
+  images      Json     // {"argent": ["url1", "url2"], "doré": ["url1", "url2"]}
+  packagingImage String? // URL de l'image du packaging
+  videoUrl     String? // URL de la vidéo du produit
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("products")
+}
+
+model Order {
+  id              String   @id @default(cuid())
+  customerName    String   @map("customer_name")
+  customerEmail   String   @map("customer_email")
+  customerPhone   String   @map("customer_phone")
+  customerAddress String   @map("customer_address")
+  items           Json     // [{name, price, color, size, quantity}]
+  total           Float
+  status          String   @default("pending") // pending, paid, shipped
+  stripePaymentId String? @map("stripe_payment_id")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("orders")
+}

@@ -1,0 +1,41 @@
+# Environment variables
+.env
+.env.local
+.env.development
+.env.production
+
+# Dependencies
+node_modules
+dist
+
+# Logs
+*.log
+
+# Database
+*.db
+*.sqlite
+
+# Prisma
+prisma/migrations/
+
+# Uploads
+uploads/
+
+# Editor
+.vscode
+.idea
+
+node_modules/
+dist/
+build/
+.vercel/
+.next/
+.env
+.env.local
+*.log
+.vscode/
+
+# médias lourds
+*.psd
+*.psb
+*.mp4
