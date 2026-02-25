@@ -30,6 +30,7 @@ export default defineConfig(({ mode }) => ({
       },
     },
   },
+  base: mode === 'production' ? '/' : '/',
   preview: {
     port: 4173,
     host: true,
