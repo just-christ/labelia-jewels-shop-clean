@@ -119,24 +119,28 @@ async function initializeDatabase() {
     // Check if products exist, if not create sample products
     const productCount = await prisma.product.count();
     if (productCount > 0) {
-      console.log('🗑️ Deleting existing products with wrong types...');
+      console.log('🗑️ Deleting existing products...');
       await prisma.$executeRaw`DELETE FROM products`;
       console.log('✅ Existing products deleted');
     }
     
-    console.log('🌱 Creating sample products...');
+    console.log('🌱 Creating 7 real Labelia products...');
     
-    // Insert products using raw SQL with proper JSON format
+    // Insert the 7 real products with all images
     await prisma.$executeRaw`
-      INSERT INTO products (id, name, description, price, category, colors, sizes, stock, images, "createdAt", "updatedAt")
+      INSERT INTO products (id, name, description, price, category, colors, sizes, stock, images, "packagingImage", "videoUrl", "createdAt", "updatedAt")
         VALUES 
-          ('prod-1', 'Colonne Lumineuse', 'Une colonne élégante qui capte la lumière', 89, 'colonne', '["argent"]', '["40 cm", "45 cm", "50 cm"]', 25, '[]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-          ('prod-2', 'Bracelet Rosée', 'Un bracelet fin et raffiné, parfait pour sublimer votre poignet', 39, 'bracelet', '["argent", "doré"]', '["16 cm", "18 cm", "20 cm"]', 22, '[]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-          ('prod-3', 'Bague Sérénité', 'Bague fine et épurée, un bijou essentiel pour chaque jour', 35, 'bague', '["argent", "doré"]', '["48", "50", "52", "54", "56"]', 28, '[]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+          ('prod-1', 'bague de fiançaille Lumina - Argent pur & diamant Moissanite', 'Un cadeau romantique parfait, cette bague de fiançailles fine en argent pur avec diamant unique illumine l''amour. Design simple et original, symbole d''élégance et d''éternité.', 250000, 'bague', '["argent"]', '["50", "52", "54", "56"]', 10, '{"argent": ["JH0A9575.jpg", "JH0A9678.jpg", "JH0A9690.jpg"]}', 'JH0A9831.jpg', '', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+          ('prod-2', 'bague de fiançaille AÏNA - Argent pur & diamant Moissanite & zircon pierre', 'La bague AÏNA associe un diamant central étincelant à un halo de petites pierres en zircon pour un rendu sophistiqué. Un bijou de luxe en argent pur, parfait pour une demande en mariage ou fiançailles.', 320000, 'bague', '["argent"]', '["50", "52", "54", "56"]', 8, '{"argent": ["JH0A3163_3.jpg", "JH0A3163_4.jpg", "JH0A3163_2.jpg"]}', 'JH0A3163.jpg', '', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+          ('prod-3', 'bague de fiançaille Héra - bague de fiançaille pour femme', 'Offrez un cadeau précieux et inoubliable avec la bague Héra, diamant moissanite central et des pierres de zircon dans un design torsadé raffiné. Idéale pour symboliser l''amour et la douceur féminine.', 280000, 'bague', '["argent"]', '["50", "52", "54", "56"]', 12, '{"argent": ["JH0A9850.jpg", "JH0A0631.jpg", "JH0A0060.jpg"]}', 'JH0A0055.jpg', '', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+          ('prod-4', 'chaine pour femme Lovéa', 'Exprimez votre amour avec le collier Lovéa, un bijou élégant où trois diamants scintillants forment un cœur parfait. Idéal comme cadeau pour elle, ce collier en argent pur et diamants Moissanite allie raffinement, amour et luxe discret.', 180000, 'chaîne', '["argent"]', '["40 cm", "45 cm", "50 cm"]', 15, '{"argent": ["JH0A8027.jpg", "JH0A8027_2.jpg"]}', '', '', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+          ('prod-5', 'collier Lys - bijoux original pour femme', 'Un bijou minimaliste et raffiné avec un diamant rond central comme médaille. Parfait pour les femmes qui aiment les bijoux fins et les bijoux élégants.', 150000, 'chaîne', '["argent"]', '["40 cm", "45 cm", "50 cm"]', 20, '{"argent": ["Image_4.jpg", "Image_2.jpg"]}', '', '', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+          ('prod-6', 'Bracelet Véa - bijoux tendance', 'Le bracelet Véa séduit par son œil central recouvert de diamants Moissanite, symbole de lumière et protection, un bijou tendance et moderne pour toutes les occasions.', 120000, 'bracelet', '["argent"]', '["16 cm", "18 cm", "20 cm"]', 25, '{"argent": ["JH0A1768.jpg", "JH0A1768_1.jpg", "JH0A1768_2.jpg", "JH0A1768_3.jpg"]}', '', '', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+          ('prod-7', 'Bracelet Lys – Éclat et féminité', 'Offrez le bracelet Lys, un bijou précieux et lumineux avec diamant central et deux diamants secondaires. Idéal comme cadeau romantique ou bijou pour femme élégante.', 135000, 'bracelet', '["argent"]', '["16 cm", "18 cm", "20 cm"]', 18, '{"argent": ["579A6473.jpg", "115A9447.jpg", "2X5A8099.jpg"]}', '', '', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
         ON CONFLICT (id) DO NOTHING
       `;
       
-      console.log('✅ Sample products created');
+      console.log('✅ 7 real Labelia products created with all images!');
 
   } catch (error) {
     console.error('❌ Database initialization error:', error);
