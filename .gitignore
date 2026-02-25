@@ -5,7 +5,8 @@ build/
 .next/
 .env
 .env.local
-.env.exemple
+.env.production
+.env.example
 *.log
 .vscode/
 *.psd
