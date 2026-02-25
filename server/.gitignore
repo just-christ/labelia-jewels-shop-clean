@@ -15,8 +15,8 @@ dist
 *.db
 *.sqlite
 
-# Prisma
-prisma/migrations/
+# Prisma (généré automatiquement sur serveur)
+# prisma/migrations/
 
 # Uploads
 uploads/
