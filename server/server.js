@@ -40,9 +40,14 @@ async function initializeDatabase() {
     await prisma.$connect();
     console.log('✅ Database connected successfully');
 
-    // Créer la table users si elle n'existe pas
+    // DROP toutes les tables pour repartir propre
+    await prisma.$executeRaw`DROP TABLE IF EXISTS products CASCADE`;
+    await prisma.$executeRaw`DROP TABLE IF EXISTS orders CASCADE`;
+    await prisma.$executeRaw`DROP TABLE IF EXISTS users CASCADE`;
+
+    // Recréer avec les bons types (JSONB pour colors, sizes, images)
     await prisma.$executeRaw`
-      CREATE TABLE IF NOT EXISTS users (
+      CREATE TABLE users (
         id TEXT PRIMARY KEY,
         email TEXT UNIQUE NOT NULL,
         password TEXT NOT NULL,
@@ -51,9 +56,8 @@ async function initializeDatabase() {
       )
     `;
 
-    // Créer la table orders si elle n'existe pas
     await prisma.$executeRaw`
-      CREATE TABLE IF NOT EXISTS orders (
+      CREATE TABLE orders (
         id TEXT PRIMARY KEY,
         customer_name TEXT NOT NULL DEFAULT '',
         customer_email TEXT NOT NULL DEFAULT '',
@@ -68,8 +72,6 @@ async function initializeDatabase() {
       )
     `;
 
-    // DROP + RECREATE products avec le bon type TEXT[] pour colors et sizes
-    await prisma.$executeRaw`DROP TABLE IF EXISTS products CASCADE`;
     await prisma.$executeRaw`
       CREATE TABLE products (
         id TEXT PRIMARY KEY,
@@ -77,8 +79,8 @@ async function initializeDatabase() {
         description TEXT NOT NULL DEFAULT '',
         price FLOAT NOT NULL,
         category TEXT NOT NULL,
-        colors TEXT[],
-        sizes TEXT[],
+        colors JSONB DEFAULT '[]',
+        sizes JSONB DEFAULT '[]',
         stock INTEGER NOT NULL DEFAULT 0,
         images JSONB DEFAULT '{}',
         "packagingImage" TEXT DEFAULT '',
@@ -87,124 +89,61 @@ async function initializeDatabase() {
         "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `;
+
     console.log('✅ Tables created successfully');
 
     // Admin user
-    const adminUser = await prisma.user.findUnique({
-      where: { email: 'admin@labelia.fr' }
-    });
+    const hashedPassword = await bcrypt.hash('admin123', 10);
+    const adminId = 'admin-' + Date.now();
+    await prisma.$executeRaw`
+      INSERT INTO users (id, email, password, role) 
+      VALUES (${adminId}, 'admin@labelia.fr', ${hashedPassword}, 'admin')
+      ON CONFLICT (email) DO NOTHING
+    `;
+    console.log('✅ Admin user ready');
 
-    if (!adminUser) {
-      const hashedPassword = await bcrypt.hash('admin123', 10);
-      await prisma.user.create({
-        data: {
-          email: 'admin@labelia.fr',
-          password: hashedPassword,
-          role: 'admin'
-        }
-      });
-      console.log('✅ Default admin user created (admin@labelia.fr / admin123)');
-    }
-
-    // Seed produits
+    // Produits avec JSONB — pas de TEXT[], plus de bug
     console.log('🌱 Creating 7 real Labelia products...');
-    
-    await prisma.product.createMany({
-      data: [
-        {
-          id: 'prod-1',
-          name: 'bague de fiançaille Lumina - Argent pur & diamant Moissanite',
-          description: 'Un cadeau romantique parfait, cette bague de fiançailles fine en argent pur avec diamant unique illumine l\'amour. Design simple et original, symbole d\'élégance et d\'éternité.',
-          price: 250000,
-          category: 'bague',
-          colors: ['argent'],
-          sizes: ['50', '52', '54', '56'],
-          stock: 10,
-          images: { argent: ['JH0A9575.jpg', 'JH0A9678.jpg', 'JH0A9690.jpg'] },
-          packagingImage: 'JH0A9831.jpg',
-          videoUrl: ''
-        },
-        {
-          id: 'prod-2',
-          name: 'bague de fiançaille AÏNA - Argent pur & diamant Moissanite & zircon pierre',
-          description: 'La bague AÏNA associe un diamant central étincelant à un halo de petites pierres en zircon pour un rendu sophistiqué. Un bijou de luxe en argent pur, parfait pour une demande en mariage ou fiançailles.',
-          price: 320000,
-          category: 'bague',
-          colors: ['argent'],
-          sizes: ['50', '52', '54', '56'],
-          stock: 8,
-          images: { argent: ['JH0A3163_3.jpg', 'JH0A3163_4.jpg', 'JH0A3163_2.jpg'] },
-          packagingImage: 'JH0A3163.jpg',
-          videoUrl: ''
-        },
-        {
-          id: 'prod-3',
-          name: 'bague de fiançaille Héra - bague de fiançaille pour femme',
-          description: 'Offrez un cadeau précieux et inoubliable avec la bague Héra, diamant moissanite central et des pierres de zircon dans un design torsadé raffiné. Idéale pour symboliser l\'amour et la douceur féminine.',
-          price: 280000,
-          category: 'bague',
-          colors: ['argent'],
-          sizes: ['50', '52', '54', '56'],
-          stock: 12,
-          images: { argent: ['JH0A9850.jpg', 'JH0A0631.jpg', 'JH0A0060.jpg'] },
-          packagingImage: 'JH0A0055.jpg',
-          videoUrl: ''
-        },
-        {
-          id: 'prod-4',
-          name: 'chaine pour femme Lovéa',
-          description: 'Exprimez votre amour avec le collier Lovéa, un bijou élégant où trois diamants scintillants forment un cœur parfait. Idéal comme cadeau pour elle, ce collier en argent pur et diamants Moissanite allie raffinement, amour et luxe discret.',
-          price: 180000,
-          category: 'chaîne',
-          colors: ['argent'],
-          sizes: ['40 cm', '45 cm', '50 cm'],
-          stock: 15,
-          images: { argent: ['JH0A8027.jpg', 'JH0A8027_2.jpg'] },
-          packagingImage: '',
-          videoUrl: ''
-        },
-        {
-          id: 'prod-5',
-          name: 'collier Lys - bijoux original pour femme',
-          description: 'Un bijou minimaliste et raffiné avec un diamant rond central comme médaille. Parfait pour les femmes qui aiment les bijoux fins et les bijoux élégants.',
-          price: 150000,
-          category: 'chaîne',
-          colors: ['argent'],
-          sizes: ['40 cm', '45 cm', '50 cm'],
-          stock: 20,
-          images: { argent: ['Image_4.jpg', 'Image_2.jpg'] },
-          packagingImage: '',
-          videoUrl: ''
-        },
-        {
-          id: 'prod-6',
-          name: 'Bracelet Véa - bijoux tendance',
-          description: 'Le bracelet Véa séduit par son œil central recouvert de diamants Moissanite, symbole de lumière et protection, un bijou tendance et moderne pour toutes les occasions.',
-          price: 120000,
-          category: 'bracelet',
-          colors: ['argent'],
-          sizes: ['16 cm', '18 cm', '20 cm'],
-          stock: 25,
-          images: { argent: ['JH0A1768.jpg', 'JH0A1768_1.jpg', 'JH0A1768_2.jpg', 'JH0A1768_3.jpg'] },
-          packagingImage: '',
-          videoUrl: ''
-        },
-        {
-          id: 'prod-7',
-          name: 'Bracelet Lys – Éclat et féminité',
-          description: 'Offrez le bracelet Lys, un bijou précieux et lumineux avec diamant central et deux diamants secondaires. Idéal comme cadeau romantique ou bijou pour femme élégante.',
-          price: 135000,
-          category: 'bracelet',
-          colors: ['argent'],
-          sizes: ['16 cm', '18 cm', '20 cm'],
-          stock: 18,
-          images: { argent: ['579A6473.jpg', '115A9447.jpg', '2X5A8099.jpg'] },
-          packagingImage: '',
-          videoUrl: ''
-        }
-      ]
-    });
-    
+
+    await prisma.$executeRaw`
+      INSERT INTO products (id, name, description, price, category, colors, sizes, stock, images, "packagingImage", "videoUrl")
+      VALUES 
+        ('prod-1', 'bague de fiancaille Lumina - Argent pur & diamant Moissanite',
+          'Un cadeau romantique parfait, cette bague de fiancailles fine en argent pur avec diamant unique illumine l''amour.',
+          250000, 'bague', '["argent"]'::jsonb, '["50","52","54","56"]'::jsonb, 10,
+          '{"argent": ["JH0A9575.jpg", "JH0A9678.jpg", "JH0A9690.jpg"]}'::jsonb, 'JH0A9831.jpg', ''),
+
+        ('prod-2', 'bague de fiancaille AINA - Argent pur & diamant Moissanite & zircon',
+          'La bague AINA associe un diamant central etincelant a un halo de petites pierres en zircon.',
+          320000, 'bague', '["argent"]'::jsonb, '["50","52","54","56"]'::jsonb, 8,
+          '{"argent": ["JH0A3163_3.jpg", "JH0A3163_4.jpg", "JH0A3163_2.jpg"]}'::jsonb, 'JH0A3163.jpg', ''),
+
+        ('prod-3', 'bague de fiancaille Hera - bague de fiancaille pour femme',
+          'Offrez un cadeau precieux et inoubliable avec la bague Hera, diamant moissanite central.',
+          280000, 'bague', '["argent"]'::jsonb, '["50","52","54","56"]'::jsonb, 12,
+          '{"argent": ["JH0A9850.jpg", "JH0A0631.jpg", "JH0A0060.jpg"]}'::jsonb, 'JH0A0055.jpg', ''),
+
+        ('prod-4', 'chaine pour femme Lovea',
+          'Exprimez votre amour avec le collier Lovea, un bijou elegant.',
+          180000, 'chaîne', '["argent"]'::jsonb, '["40 cm","45 cm","50 cm"]'::jsonb, 15,
+          '{"argent": ["JH0A8027.jpg", "JH0A8027_2.jpg"]}'::jsonb, '', ''),
+
+        ('prod-5', 'collier Lys - bijoux original pour femme',
+          'Un bijou minimaliste et raffine avec un diamant rond central comme medaille.',
+          150000, 'chaîne', '["argent"]'::jsonb, '["40 cm","45 cm","50 cm"]'::jsonb, 20,
+          '{"argent": ["Image_4.jpg", "Image_2.jpg"]}'::jsonb, '', ''),
+
+        ('prod-6', 'Bracelet Vea - bijoux tendance',
+          'Le bracelet Vea seduit par son oeil central recouvert de diamants Moissanite.',
+          120000, 'bracelet', '["argent"]'::jsonb, '["16 cm","18 cm","20 cm"]'::jsonb, 25,
+          '{"argent": ["JH0A1768.jpg", "JH0A1768_1.jpg", "JH0A1768_2.jpg", "JH0A1768_3.jpg"]}'::jsonb, '', ''),
+
+        ('prod-7', 'Bracelet Lys - Eclat et feminite',
+          'Offrez le bracelet Lys, un bijou precieux et lumineux avec diamant central.',
+          135000, 'bracelet', '["argent"]'::jsonb, '["16 cm","18 cm","20 cm"]'::jsonb, 18,
+          '{"argent": ["579A6473.jpg", "115A9447.jpg", "2X5A8099.jpg"]}'::jsonb, '', '')
+    `;
+
     console.log('✅ 7 real Labelia products created!');
 
   } catch (error) {
