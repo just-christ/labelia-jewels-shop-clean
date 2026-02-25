@@ -126,13 +126,13 @@ async function initializeDatabase() {
     
     console.log('🌱 Creating sample products...');
     
-    // Insert products using raw SQL to avoid JSON format issues
+    // Insert products using raw SQL with proper JSON format
     await prisma.$executeRaw`
       INSERT INTO products (id, name, description, price, category, colors, sizes, stock, images, "createdAt", "updatedAt")
         VALUES 
-          ('prod-1', 'Colonne Lumineuse', 'Une colonne élégante qui capte la lumière', 89, 'colonne', ARRAY['argent'], ARRAY['40 cm', '45 cm', '50 cm'], 25, '[]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-          ('prod-2', 'Bracelet Rosée', 'Un bracelet fin et raffiné, parfait pour sublimer votre poignet', 39, 'bracelet', ARRAY['argent', 'doré'], ARRAY['16 cm', '18 cm', '20 cm'], 22, '[]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-          ('prod-3', 'Bague Sérénité', 'Bague fine et épurée, un bijou essentiel pour chaque jour', 35, 'bague', ARRAY['argent', 'doré'], ARRAY['48', '50', '52', '54', '56'], 28, '[]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+          ('prod-1', 'Colonne Lumineuse', 'Une colonne élégante qui capte la lumière', 89, 'colonne', '["argent"]', '["40 cm", "45 cm", "50 cm"]', 25, '[]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+          ('prod-2', 'Bracelet Rosée', 'Un bracelet fin et raffiné, parfait pour sublimer votre poignet', 39, 'bracelet', '["argent", "doré"]', '["16 cm", "18 cm", "20 cm"]', 22, '[]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+          ('prod-3', 'Bague Sérénité', 'Bague fine et épurée, un bijou essentiel pour chaque jour', 35, 'bague', '["argent", "doré"]', '["48", "50", "52", "54", "56"]', 28, '[]', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
         ON CONFLICT (id) DO NOTHING
       `;
       
