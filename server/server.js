@@ -40,73 +40,98 @@ async function initializeDatabase() {
     await prisma.$connect();
     console.log('✅ Database connected successfully');
 
-    // DROP toutes les tables pour repartir propre
-    await prisma.$executeRaw`DROP TABLE IF EXISTS products CASCADE`;
-    await prisma.$executeRaw`DROP TABLE IF EXISTS orders CASCADE`;
-    await prisma.$executeRaw`DROP TABLE IF EXISTS users CASCADE`;
-
-    // Recréer avec les bons types (JSONB pour colors, sizes, images)
-    await prisma.$executeRaw`
-      CREATE TABLE users (
-        id TEXT PRIMARY KEY,
-        email TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL,
-        role TEXT DEFAULT 'user',
-        "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
+    // Vérifier si les tables existent (PRODUCTION SAFE)
+    const tablesExist = await prisma.$queryRaw`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables 
+        WHERE table_schema = 'public' 
+        AND table_name = 'products'
+      ) as exists
     `;
 
-    await prisma.$executeRaw`
-      CREATE TABLE orders (
-        id TEXT PRIMARY KEY,
-        customer_name TEXT NOT NULL DEFAULT '',
-        customer_email TEXT NOT NULL DEFAULT '',
-        customer_phone TEXT NOT NULL DEFAULT '',
-        customer_address TEXT NOT NULL DEFAULT '',
-        items JSONB NOT NULL DEFAULT '[]',
-        total FLOAT NOT NULL,
-        status TEXT DEFAULT 'pending',
-        stripe_payment_id TEXT,
-        "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
+    // Créer les tables seulement si elles n'existent pas
+    if (!tablesExist[0]?.exists) {
+      console.log('🆕 Creating tables for first time...');
+      
+      await prisma.$executeRaw`
+        CREATE TABLE users (
+          id TEXT PRIMARY KEY,
+          email TEXT UNIQUE NOT NULL,
+          password TEXT NOT NULL,
+          role TEXT DEFAULT 'user',
+          "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `;
+
+      await prisma.$executeRaw`
+        CREATE TABLE orders (
+          id TEXT PRIMARY KEY,
+          customer_name TEXT NOT NULL DEFAULT '',
+          customer_email TEXT NOT NULL DEFAULT '',
+          customer_phone TEXT NOT NULL DEFAULT '',
+          customer_address TEXT NOT NULL DEFAULT '',
+          items JSONB NOT NULL DEFAULT '[]',
+          total FLOAT NOT NULL,
+          status TEXT DEFAULT 'pending',
+          stripe_payment_id TEXT,
+          "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `;
+
+      await prisma.$executeRaw`
+        CREATE TABLE products (
+          id TEXT PRIMARY KEY,
+          name TEXT NOT NULL,
+          description TEXT NOT NULL DEFAULT '',
+          price FLOAT NOT NULL,
+          category TEXT NOT NULL,
+          colors JSONB DEFAULT '[]',
+          sizes JSONB DEFAULT '[]',
+          stock INTEGER NOT NULL DEFAULT 0,
+          images JSONB DEFAULT '{}',
+          "packagingImage" TEXT DEFAULT '',
+          "videoUrl" TEXT DEFAULT '',
+          "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `;
+
+      console.log('✅ Tables created successfully');
+    } else {
+      console.log('✅ Tables already exist - skipping creation');
+    }
+
+    // Admin user (créé seulement s'il n'existe pas)
+    const adminExists = await prisma.$queryRaw`
+      SELECT EXISTS (
+        SELECT FROM users 
+        WHERE email = 'admin@labelia.fr'
+      ) as exists
     `;
 
-    await prisma.$executeRaw`
-      CREATE TABLE products (
-        id TEXT PRIMARY KEY,
-        name TEXT NOT NULL,
-        description TEXT NOT NULL DEFAULT '',
-        price FLOAT NOT NULL,
-        category TEXT NOT NULL,
-        colors JSONB DEFAULT '[]',
-        sizes JSONB DEFAULT '[]',
-        stock INTEGER NOT NULL DEFAULT 0,
-        images JSONB DEFAULT '{}',
-        "packagingImage" TEXT DEFAULT '',
-        "videoUrl" TEXT DEFAULT '',
-        "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        "updatedAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
+    if (!adminExists[0]?.exists) {
+      const hashedPassword = await bcrypt.hash('admin123', 10);
+      const adminId = 'admin-' + Date.now();
+      await prisma.$executeRaw`
+        INSERT INTO users (id, email, password, role) 
+        VALUES (${adminId}, 'admin@labelia.fr', ${hashedPassword}, 'admin')
+      `;
+      console.log('✅ Admin user created');
+    } else {
+      console.log('✅ Admin user already exists');
+    }
+
+    // Produits (créés seulement s'ils n'existent pas)
+    const productsCount = await prisma.$queryRaw`
+      SELECT COUNT(*) as count FROM products
     `;
 
-    console.log('✅ Tables created successfully');
-
-    // Admin user
-    const hashedPassword = await bcrypt.hash('admin123', 10);
-    const adminId = 'admin-' + Date.now();
-    await prisma.$executeRaw`
-      INSERT INTO users (id, email, password, role) 
-      VALUES (${adminId}, 'admin@labelia.fr', ${hashedPassword}, 'admin')
-      ON CONFLICT (email) DO NOTHING
-    `;
-    console.log('✅ Admin user ready');
-
-    // Produits avec JSONB — pas de TEXT[], plus de bug
-    console.log('🌱 Creating 7 real Labelia products...');
-
-    // Création des produits avec Prisma Client (plus sûr que SQL brut)
-    const products = [
+    if (productsCount[0]?.count === 0) {
+      console.log('🌱 Creating 7 real Labelia products...');
+      
+      // Création des produits avec Prisma Client (plus sûr que SQL brut)
+      const products = [
       {
         id: 'prod-1',
         name: 'bague de fiançaille Lumina - Argent pur & diamant Moissanite',
@@ -210,6 +235,9 @@ async function initializeDatabase() {
     }
 
     console.log('✅ 7 real Labelia products created!');
+    } else {
+      console.log('✅ Products already exist - skipping creation');
+    }
 
   } catch (error) {
     console.error('❌ Database initialization error:', error);
