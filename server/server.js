@@ -193,7 +193,7 @@ async function initializeDatabase() {
         colors: ['argent'],
         sizes: ['40 cm', '45 cm', '50 cm'],
         stock: 20,
-        images: { argent: ['Image_4.jpg', 'Image_2.jpg'] },
+        images: { argent: ['image_4.jpg', 'image_2.jpg'] },
         packagingImage: 'packaging.png',
         videoUrl: ''
       },
