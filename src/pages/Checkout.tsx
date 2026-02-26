@@ -98,7 +98,7 @@ export default function Checkout() {
           disabled={submitting}
           className="w-full py-4 text-sm font-medium tracking-wider uppercase bg-btn text-btn-foreground hover:bg-btn-hover transition-colors rounded-sm mt-6 disabled:opacity-50"
         >
-          {submitting ? "Traitement..." : `Confirmer la commande — ${totalPrice} €`}
+          {submitting ? "Traitement..." : `Confirmer la commande — ${totalPrice} F CFA`}
         </button>
       </form>
     </section>

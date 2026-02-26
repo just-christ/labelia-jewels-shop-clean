@@ -108,40 +108,40 @@ async function initializeDatabase() {
     await prisma.$executeRaw`
       INSERT INTO products (id, name, description, price, category, colors, sizes, stock, images, "packagingImage", "videoUrl")
       VALUES 
-        ('prod-1', 'bague de fiancaille Lumina - Argent pur & diamant Moissanite',
-          'Un cadeau romantique parfait, cette bague de fiancailles fine en argent pur avec diamant unique illumine l''amour.',
-          250000, 'bague', '["argent"]'::jsonb, '["50","52","54","56"]'::jsonb, 10,
-          '{"argent": ["JH0A9575.jpg", "JH0A9678.jpg", "JH0A9690.jpg"]}'::jsonb, 'JH0A9831.jpg', ''),
+        ('prod-1', 'bague de fiançaille Lumina - Argent pur & diamant Moissanite',
+          'Un cadeau romantique parfait, cette bague de fiançailles fine en argent pur avec diamant unique illumine l\'amour. Design simple et original, symbole d\'élégance et d\'éternité.',
+          45000, 'bague', '["argent"]'::jsonb, '["6","7","8","9"]'::jsonb, 10,
+          '{"argent": ["JH0A9575.jpg", "JH0A9678.jpg", "JH0A9690.jpg"]}'::jsonb, 'packaging.png', ''),
 
-        ('prod-2', 'bague de fiancaille AINA - Argent pur & diamant Moissanite & zircon',
-          'La bague AINA associe un diamant central etincelant a un halo de petites pierres en zircon.',
-          320000, 'bague', '["argent"]'::jsonb, '["50","52","54","56"]'::jsonb, 8,
-          '{"argent": ["JH0A3163_3.jpg", "JH0A3163_4.jpg", "JH0A3163_2.jpg"]}'::jsonb, 'JH0A3163.jpg', ''),
+        ('prod-2', 'bague de fiançaille AÏNA- Argent pur & diamant Moissanite & zircon',
+          'La bague AÏNA associe un diamant central étincelant à un halo de petites pierres en zircon pour un rendu sophistiqué. Un bijou de luxe en argent pur, parfait pour une demande en mariage ou fiançailles.',
+          50000, 'bague', '["argent"]'::jsonb, '["6","7"]'::jsonb, 8,
+          '{"argent": ["JH0A3163_3.jpg", "JH0A3163_4.jpg", "JH0A3163_2.jpg"]}'::jsonb, 'packaging.png', ''),
 
         ('prod-3', 'bague de fiancaille Hera - bague de fiancaille pour femme',
-          'Offrez un cadeau precieux et inoubliable avec la bague Hera, diamant moissanite central.',
-          280000, 'bague', '["argent"]'::jsonb, '["50","52","54","56"]'::jsonb, 12,
-          '{"argent": ["JH0A9850.jpg", "JH0A0631.jpg", "JH0A0060.jpg"]}'::jsonb, 'JH0A0055.jpg', ''),
+          'Offrez un cadeau précieux et inoubliable avec la bague Héra, diamant moissanite central et des pierres de zircon dans un design torsadé raffiné. Idéale pour symboliser l\'amour et la douceur féminine.',
+          50000, 'bague', '["argent"]'::jsonb, '["8"]'::jsonb, 12,
+          '{"argent": ["JH0A9850.jpg", "JH0A0631.jpg", "JH0A0060.jpg"]}'::jsonb, 'packaging.png', ''),
 
-        ('prod-4', 'chaine pour femme Lovea',
-          'Exprimez votre amour avec le collier Lovea, un bijou elegant.',
-          180000, 'chaîne', '["argent"]'::jsonb, '["40 cm","45 cm","50 cm"]'::jsonb, 15,
-          '{"argent": ["JH0A8027.jpg", "JH0A8027_2.jpg"]}'::jsonb, '', ''),
+        ('prod-4', 'chaine pour femme Lovéa',
+          'Exprimez votre amour avec le collier Lovéa, un bijou élégant où trois diamants scintillants forment un cœur parfait. Idéal comme cadeau pour elle, ce collier en argent pur et diamants Moissanite allie raffinement, amour et luxe discret.',
+          40000, 'chaîne', '["argent"]'::jsonb, '["40 cm","45 cm","50 cm"]'::jsonb, 15,
+          '{"argent": ["JH0A8027.jpg", "JH0A8027_2.jpg"]}'::jsonb, 'packaging.png', ''),
 
         ('prod-5', 'collier Lys - bijoux original pour femme',
-          'Un bijou minimaliste et raffine avec un diamant rond central comme medaille.',
-          150000, 'chaîne', '["argent"]'::jsonb, '["40 cm","45 cm","50 cm"]'::jsonb, 20,
-          '{"argent": ["Image_4.jpg", "Image_2.jpg"]}'::jsonb, '', ''),
+          'Un bijou minimaliste et raffiné avec un diamant rond central comme médaille. Parfait pour les femmes qui aiment les bijoux fins et les bijoux élégants.',
+          35000, 'chaîne', '["argent"]'::jsonb, '["40 cm","45 cm","50 cm"]'::jsonb, 20,
+          '{"argent": ["Image_4.jpg", "Image_2.jpg"]}'::jsonb, 'packaging.png', ''),
 
-        ('prod-6', 'Bracelet Vea - bijoux tendance',
-          'Le bracelet Vea seduit par son oeil central recouvert de diamants Moissanite.',
-          120000, 'bracelet', '["argent"]'::jsonb, '["16 cm","18 cm","20 cm"]'::jsonb, 25,
-          '{"argent": ["JH0A1768.jpg", "JH0A1768_1.jpg", "JH0A1768_2.jpg", "JH0A1768_3.jpg"]}'::jsonb, '', ''),
+        ('prod-6', 'Bracelet Véa- bijoux tendance',
+          'Le bracelet Véa séduit par son œil central recouvert de diamants Moissanite, symbole de lumière et protection, un bijou tendance et moderne pour toutes les occasions.',
+          35000, 'bracelet', '["argent"]'::jsonb, '["16 cm","18 cm","20 cm"]'::jsonb, 25,
+          '{"argent": ["JH0A1768.jpg", "JH0A1768_1.jpg", "JH0A1768_2.jpg", "JH0A1768_3.jpg"]}'::jsonb, 'packaging.png', ''),
 
-        ('prod-7', 'Bracelet Lys - Eclat et feminite',
-          'Offrez le bracelet Lys, un bijou precieux et lumineux avec diamant central.',
-          135000, 'bracelet', '["argent"]'::jsonb, '["16 cm","18 cm","20 cm"]'::jsonb, 18,
-          '{"argent": ["579A6473.jpg", "115A9447.jpg", "2X5A8099.jpg"]}'::jsonb, '', '')
+        ('prod-7', 'Bracelet Lys – Éclat et féminité',
+          'Offrez le bracelet Lys, un bijou précieux et lumineux avec diamant central et deux diamants secondaires. Idéal comme cadeau romantique ou bijou pour femme élégante.',
+          35000, 'bracelet', '["argent"]'::jsonb, '["16 cm","18 cm","20 cm"]'::jsonb, 18,
+          '{"argent": ["579A6473.jpg", "115A9447.jpg", "2X5A8099.jpg"]}'::jsonb, 'packaging.png', '')
     `;
 
     console.log('✅ 7 real Labelia products created!');

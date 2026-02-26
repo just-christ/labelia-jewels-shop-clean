@@ -134,7 +134,7 @@ export default function AdminOrders() {
                     {(order.items as any[]).map((item: any, i: number) => (
                       <div key={i} className="flex justify-between text-sm py-1">
                         <span>{item.name} ({item.color}, {item.size}) × {item.quantity}</span>
-                        <span>{item.price * item.quantity} €</span>
+                        <span>{item.price * item.quantity} F CFA</span>
                       </div>
                     ))}
                   </div>

@@ -43,7 +43,7 @@ export default function Cart() {
               <p className="text-xs text-muted-foreground capitalize">
                 {item.color} · {item.size}
               </p>
-              <p className="text-sm font-medium mt-1">{item.product.price} €</p>
+              <p className="text-sm font-medium mt-1">{item.product.price} F CFA</p>
             </div>
             <div className="flex items-center gap-2">
               <button
