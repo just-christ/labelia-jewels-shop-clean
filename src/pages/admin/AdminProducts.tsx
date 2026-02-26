@@ -23,6 +23,9 @@ interface Product {
 
 // ─── Images disponibles - Collection DIAMOND UNIVERS ─────────────────────────
 const AVAILABLE_IMAGES: string[] = [
+  // Packaging universel
+  "packaging.png",
+  
   // Bague Lumina
   "JH0A9575.jpg",  // Image de couverture
   "JH0A9678.jpg",  // Image produit
@@ -211,7 +214,7 @@ function SingleImagePicker({
       {selected && (
         <div className="flex items-center gap-3 p-2 border-t bg-secondary/10">
           <img
-            src={`/IMAGES/${selected}`}
+            src={`/Images/${selected}`}
             alt={selected}
             className="w-14 h-14 object-cover rounded-md border-2 border-btn"
           />

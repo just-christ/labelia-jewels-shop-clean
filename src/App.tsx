@@ -52,7 +52,6 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/admin/login" element={<AdminLogin />} />
-              <Route path="/admin" element={<AdminProtectedRoute><AdminIndex /></AdminProtectedRoute>} />
               <Route path="/admin" element={
                 <AdminProtectedRoute>
                   <AdminLayout />
