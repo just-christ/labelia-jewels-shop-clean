@@ -69,10 +69,11 @@ export default function ProductGallery({
             poster={currentImage}
           />
         ) : (
-          <img
+          <img 
             src={currentImage || `/Images/placeholder.jpg`}
             alt={`${productName} - ${selectedColor}`}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            loading="lazy"
             onError={(e) => {
               // Fallback to placeholder on error
               (e.target as HTMLImageElement).src = `data:image/svg+xml,%3Csvg width='400' height='400' xmlns='http://www.w3.org/2000/svg'%3E%3Crect fill='%23f0f0f0' width='400' height='400'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-family='Arial' font-size='16'%3EImage non disponible%3C/text%3E%3C/svg%3E`;

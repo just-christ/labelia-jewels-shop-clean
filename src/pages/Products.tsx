@@ -122,6 +122,7 @@ export default function Products() {
                   src={getFirstImage(product.images)} 
                   alt={product.name}
                   className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                  loading="lazy"
                 />
                 {product.videoUrl && (
                   <div className="absolute top-2 left-2 p-1.5 rounded-full bg-black/50">

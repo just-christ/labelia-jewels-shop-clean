@@ -35,6 +35,7 @@ export default function Cart() {
                 src={item.product.images[item.color]}
                 alt={item.product.name}
                 className="w-full h-full object-cover"
+                loading="lazy"
               />
             </div>
             <div className="flex-1 min-w-0">
