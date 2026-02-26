@@ -117,7 +117,7 @@ export default function ProductDetail() {
             {product.category}
           </p>
           <h1 className="font-display text-4xl font-semibold mb-2">{product.name}</h1>
-          <span className="text-3xl font-display font-medium">{product.price} F CFA</span>
+          <span className="text-3xl font-display font-medium">{product.price.toLocaleString()} F CFA</span>
           <p className="text-muted-foreground leading-relaxed mb-8">{product.description}</p>
 
           {/* Color selector */}

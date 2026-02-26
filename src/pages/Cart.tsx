@@ -32,10 +32,13 @@ export default function Cart() {
           >
             <div className="w-20 h-20 bg-secondary rounded-sm overflow-hidden flex-shrink-0">
               <img
-                src={item.product.images[item.color]}
+                src={item.product.images[item.color]?.[0] || '/Images/placeholder.png'}
                 alt={item.product.name}
                 className="w-full h-full object-cover"
                 loading="lazy"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/Images/placeholder.png';
+                }}
               />
             </div>
             <div className="flex-1 min-w-0">
@@ -43,7 +46,7 @@ export default function Cart() {
               <p className="text-xs text-muted-foreground capitalize">
                 {item.color} · {item.size}
               </p>
-              <p className="text-sm font-medium mt-1">{item.product.price} F CFA</p>
+              <p className="text-sm font-medium mt-1">{item.product.price.toLocaleString()} F CFA</p>
             </div>
             <div className="flex items-center gap-2">
               <button
@@ -73,7 +76,7 @@ export default function Cart() {
       <div className="border-t mt-8 pt-6">
         <div className="flex justify-between items-center mb-6">
           <span className="font-display text-xl font-medium">Total</span>
-          <span className="font-display text-2xl font-semibold">{totalPrice} F CFA</span>
+          <span className="font-display text-2xl font-semibold">{totalPrice.toLocaleString()} F CFA</span>
         </div>
         <Link
           to="/checkout"

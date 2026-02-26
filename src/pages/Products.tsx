@@ -134,7 +134,7 @@ export default function Products() {
                 <h3 className="font-display text-lg font-medium group-hover:text-primary transition-colors">
                   {product.name}
                 </h3>
-                <p className="text-2xl font-display font-medium text-foreground">{product.price} F CFA</p>
+                <span className="text-2xl font-display font-medium text-foreground">{product.price.toLocaleString()} F CFA</span>
               </div>
             </Link>
           ))}

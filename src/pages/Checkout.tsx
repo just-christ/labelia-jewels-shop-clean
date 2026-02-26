@@ -65,12 +65,12 @@ export default function Checkout() {
             <span>
               {item.product.name} <span className="text-muted-foreground capitalize">({item.color}, {item.size}) × {item.quantity}</span>
             </span>
-            <span className="font-medium">{item.product.price * item.quantity} F CFA</span>
+            <span className="font-medium">{(item.product.price * item.quantity).toLocaleString()} F CFA</span>
           </div>
         ))}
         <div className="border-t mt-3 pt-3 flex justify-between font-medium">
           <span>Total</span>
-          <span className="text-lg">{totalPrice} F CFA</span>
+          <span className="text-lg">{totalPrice.toLocaleString()} F CFA</span>
         </div>
       </div>
 
@@ -98,7 +98,7 @@ export default function Checkout() {
           disabled={submitting}
           className="w-full py-4 text-sm font-medium tracking-wider uppercase bg-btn text-btn-foreground hover:bg-btn-hover transition-colors rounded-sm mt-6 disabled:opacity-50"
         >
-          {submitting ? "Traitement..." : `Confirmer la commande — ${totalPrice} F CFA`}
+          {submitting ? "Traitement..." : `Confirmer la commande — ${totalPrice.toLocaleString()} F CFA`}
         </button>
       </form>
     </section>

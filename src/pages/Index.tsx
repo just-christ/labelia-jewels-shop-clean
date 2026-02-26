@@ -115,17 +115,17 @@ const Index = () => {
         {/* Navigation buttons */}
         <button
           onClick={prevSlide}
-          className="absolute left-4 z-10 p-2 rounded-full bg-black/20 text-white hover:bg-black/40 transition-colors"
+          className="absolute left-4 md:left-8 z-10 p-3 md:p-2 rounded-full bg-black/20 text-white hover:bg-black/40 transition-colors touch-manipulation"
           aria-label="Slide précédent"
         >
-          <ChevronLeft size={24} />
+          <ChevronLeft size={28} className="md:w-6 md:h-6" />
         </button>
         <button
           onClick={nextSlide}
-          className="absolute right-4 z-10 p-2 rounded-full bg-black/20 text-white hover:bg-black/40 transition-colors"
+          className="absolute right-4 md:right-8 z-10 p-3 md:p-2 rounded-full bg-black/20 text-white hover:bg-black/40 transition-colors touch-manipulation"
           aria-label="Slide suivant"
         >
-          <ChevronRight size={24} />
+          <ChevronRight size={28} className="md:w-6 md:h-6" />
         </button>
 
         {/* Slide content */}
@@ -233,7 +233,7 @@ const Index = () => {
                   </h3>
                   <p className="text-muted-foreground text-sm line-clamp-2">{product.description}</p>
                   <div className="flex items-center justify-between">
-                    <span className="text-2xl font-display font-medium">{product.price} F CFA</span>
+                    <span className="text-2xl font-display font-medium">{product.price.toLocaleString()} F CFA</span>
                   </div>
                 </div>
               </Link>
