@@ -127,6 +127,19 @@ async function initializeDatabase() {
       SELECT COUNT(*) as count FROM products
     `;
 
+    // FORCER LA MISE À JOUR du collier Lys (prod-5)
+    if (productsCount[0]?.count > 0) {
+      console.log('🔄 Updating collier Lys with correct image names...');
+      await prisma.product.update({
+        where: { id: 'prod-5' },
+        data: {
+          images: { argent: ['image_4.jpg', 'image_2.jpg'] },
+          packagingImage: 'packaging.png'
+        }
+      });
+      console.log('✅ Collier Lys updated with correct images!');
+    }
+
     if (productsCount[0]?.count === 0) {
       console.log('🌱 Creating 7 real Labelia products...');
       
