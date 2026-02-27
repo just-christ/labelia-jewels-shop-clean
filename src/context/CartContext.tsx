@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from "react";
+import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 import type { Product, Color } from "@/data/products";
 
 export interface CartItem {
@@ -21,7 +21,27 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [items, setItems] = useState<CartItem[]>([]);
+  const [items, setItems] = useState<CartItem[]>(() => {
+    // Charger le panier depuis localStorage au démarrage
+    if (typeof window !== 'undefined') {
+      const savedCart = localStorage.getItem('labelia-cart');
+      if (savedCart) {
+        try {
+          return JSON.parse(savedCart);
+        } catch (error) {
+          console.error('Failed to parse cart from localStorage:', error);
+        }
+      }
+    }
+    return [];
+  });
+
+  // Sauvegarder le panier dans localStorage à chaque modification
+  useEffect(() => {
+    if (typeof window !== 'undefined' && items.length > 0) {
+      localStorage.setItem('labelia-cart', JSON.stringify(items));
+    }
+  }, [items]);
 
   const addItem = useCallback((product: Product, color: Color, size: string) => {
     setItems((prev) => {

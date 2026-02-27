@@ -5,7 +5,7 @@ import { useCart } from "@/context/CartContext";
 import { apiClient } from "@/lib/api";
 import SizeGuideModal from "@/components/SizeGuideModal";
 import ProductGallery from "@/components/ProductGallery";
-import { Ruler, Check } from "lucide-react";
+import { Ruler, Check, Eye } from "lucide-react";
 import { toast } from "sonner";
 
 interface Product {
@@ -32,6 +32,7 @@ export default function ProductDetail() {
   const [selectedColor, setSelectedColor] = useState<Color>("doré");
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
+  const [viewersCount, setViewersCount] = useState(0);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -56,6 +57,20 @@ export default function ProductDetail() {
 
     fetchProduct();
   }, [id]);
+
+  // Simuler le compteur de personnes qui regardent
+  useEffect(() => {
+    // Générer un nombre aléatoire entre 8 et 28
+    const generateViewersCount = () => Math.floor(Math.random() * 21) + 8;
+    setViewersCount(generateViewersCount());
+
+    // Mettre à jour toutes les 3 heures (10800000 ms)
+    const interval = setInterval(() => {
+      setViewersCount(generateViewersCount());
+    }, 10800000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   if (loading) {
     return (
@@ -179,6 +194,15 @@ export default function ProductDetail() {
           >
             Ajouter au panier
           </button>
+
+          {/* Viewers count */}
+          <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
+            <div className="relative">
+              <Eye size={14} className="text-green-500 animate-pulse" />
+              <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full animate-ping" />
+            </div>
+            <span>{viewersCount} personne{viewersCount > 1 ? 's' : ''} regardent ce produit</span>
+          </div>
         </div>
       </div>
 

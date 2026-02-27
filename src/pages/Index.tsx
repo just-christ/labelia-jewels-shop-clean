@@ -5,7 +5,8 @@ import { apiClient } from "@/lib/api";
 import { Sparkles, Heart, Shield, Star, ChevronLeft, ChevronRight } from "lucide-react";
 
 const Index = () => {
-  const [bestSellers, setBestSellers] = useState([]);
+  const [bestSellers, setBestSellers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [currentSlide, setCurrentSlide] = useState(0);
 
   // Carrousel slides data
@@ -39,11 +40,14 @@ const Index = () => {
   useEffect(() => {
     const fetchBestSellers = async () => {
       try {
+        setLoading(true);
         const products = await apiClient.getProducts();
         // Take first 3 products as best sellers (in real app, this would be based on sales data)
         setBestSellers(products.slice(0, 3));
       } catch (error) {
         console.error('Failed to fetch best sellers:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -109,7 +113,7 @@ const Index = () => {
               </div>
               <div className="absolute inset-0 bg-gradient-to-r from-background/60 via-background/20 to-transparent" />
             </div>
-          ))}
+          )))}
         </div>
 
         {/* Navigation buttons */}
@@ -156,7 +160,7 @@ const Index = () => {
                   {slide.buttonText}
                 </Link>
               </div>
-            ))}
+          )))}
           </div>
         </div>
 
@@ -171,7 +175,7 @@ const Index = () => {
               }`}
               aria-label={`Aller au slide ${index + 1}`}
             />
-          ))}
+          )))}
         </div>
       </section>
 
@@ -207,7 +211,20 @@ const Index = () => {
           <p className="text-muted-foreground text-lg">Les bijoux les plus appréciés de notre collection</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {bestSellers.map((product, index) => (
+          {loading ? (
+            // Loading skeleton
+            Array.from({ length: 3 }).map((_, index) => (
+              <div key={index} className="animate-pulse">
+                <div className="bg-secondary rounded-sm h-48 mb-4"></div>
+                <div className="space-y-2">
+                  <div className="bg-secondary h-6 rounded"></div>
+                  <div className="bg-secondary h-4 rounded w-3/4"></div>
+                  <div className="bg-secondary h-6 rounded w-1/2"></div>
+                </div>
+              </div>
+          )))
+          ) : (
+            bestSellers.map((product, index) => (
             <div key={product.id} className="group">
               <Link to={`/produit/${product.id}`} className="block">
                 <div className="relative overflow-hidden rounded-sm bg-secondary mb-4 group-hover:shadow-lg transition-shadow">
@@ -238,7 +255,7 @@ const Index = () => {
                 </div>
               </Link>
             </div>
-          ))}
+          )))}
         </div>
         <div className="text-center mt-12">
           <Link
@@ -267,7 +284,7 @@ const Index = () => {
                 <h3 className="font-display text-xl font-medium mb-2">{item.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
               </div>
-            ))}
+          )))}
           </div>
         </div>
       </section>
