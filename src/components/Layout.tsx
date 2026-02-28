@@ -4,6 +4,7 @@ import { useCart } from "@/context/CartContext";
 import { useState } from "react";
 import ContactModal from "@/components/ContactModal";
 import TikTokIcon from "@/components/TikTokIcon";
+import AnnouncementBar from "./AnnouncementBar";
 
 const navLinks = [
   { to: "/", label: "Accueil" },
@@ -19,6 +20,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen flex flex-col">
+
+      <AnnouncementBar />
+
+      
       <header className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-md border-b">
         <div className="container mx-auto flex items-center justify-between h-16 px-4">
           <Link to="/" className="flex items-center gap-2">
