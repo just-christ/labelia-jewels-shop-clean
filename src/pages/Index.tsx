@@ -9,7 +9,6 @@ export default function Index() {
   const [loading, setLoading] = useState(true);
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  // Carousel slides data
   const slides = [
     {
       image: "/Images/IMG_2084.jpg",
@@ -42,7 +41,6 @@ export default function Index() {
       try {
         setLoading(true);
         const products = await apiClient.getProducts();
-        // Take first 3 products as best sellers (in real app, this would be based on sales data)
         setBestSellers(products.slice(0, 3));
       } catch (error) {
         console.error('Failed to fetch best sellers:', error);
@@ -54,11 +52,10 @@ export default function Index() {
     fetchBestSellers();
   }, []);
 
-  // Auto-advance carousel
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 5000); // Change slide every 5 seconds
+    }, 5000);
 
     return () => clearInterval(timer);
   }, [slides.length]);
@@ -75,9 +72,7 @@ export default function Index() {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
   };
 
-  // Function to get the first image for a product
   const getFirstImage = (product: any) => {
-    // Try to get the first image from any color
     if (product.images && typeof product.images === 'object') {
       for (const color of Object.keys(product.images)) {
         const colorImages = product.images[color];
@@ -86,8 +81,7 @@ export default function Index() {
         }
       }
     }
-    
-    // Fallback to placeholder
+
     const bgColor = product.colors?.[0] === 'doré' ? 'FFD700' : 'C0C0C0';
     return `data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Crect fill='%23${bgColor}' width='200' height='200' rx='12'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-family='Arial' font-size='14' font-weight='bold'%3E${encodeURIComponent(product.name.substring(0, 10))}%3C/text%3E%3C/svg%3E`;
   };
@@ -105,10 +99,10 @@ export default function Index() {
               }`}
             >
               <div className="relative h-[85vh] flex items-center w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
-                <img 
-                  src={slide.image} 
+                <img
+                  src={slide.image}
                   alt={slide.title}
-                  className="w-full h-full object-cover object-center min-w-full min-h-full" 
+                  className="w-full h-full object-cover object-center min-w-full min-h-full"
                 />
               </div>
               <div className="absolute inset-0 bg-gradient-to-r from-background/60 via-background/20 to-transparent" />
@@ -116,7 +110,7 @@ export default function Index() {
           ))}
         </div>
 
-        {/* Navigation buttons */}
+        {/* Navigation dots */}
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10">
           {slides.map((_, index) => (
             <button
@@ -136,9 +130,8 @@ export default function Index() {
         <h2 className="font-display text-3xl font-semibold text-center mb-12">Nos catégories</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {categories.map((cat) => {
-            // Convert frontend plural category to database singular category
-            const dbCategory = cat.name === 'chaînes' ? 'chaîne' : 
-                              cat.name === 'bracelets' ? 'bracelet' : 
+            const dbCategory = cat.name === 'chaînes' ? 'chaîne' :
+                              cat.name === 'bracelets' ? 'bracelet' :
                               cat.name === 'bagues' ? 'bague' : cat.name;
             return (
               <Link
@@ -163,7 +156,6 @@ export default function Index() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {loading ? (
-            // Loading skeleton
             Array.from({ length: 3 }).map((_, index) => (
               <div key={index} className="animate-pulse">
                 <div className="bg-secondary rounded-sm h-48 mb-4"></div>
@@ -179,13 +171,12 @@ export default function Index() {
               <div key={product.id} className="group">
                 <Link to={`/produit/${product.id}`} className="block">
                   <div className="relative overflow-hidden rounded-sm bg-secondary mb-4 group-hover:shadow-lg transition-shadow">
-                    <img 
-                      src={getFirstImage(product)} 
+                    <img
+                      src={getFirstImage(product)}
                       alt={product.name}
                       className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                       loading="lazy"
                       onError={(e) => {
-                        // Fallback to placeholder on error
                         const bgColor = product.colors?.[0] === 'doré' ? 'FFD700' : 'C0C0C0';
                         (e.target as HTMLImageElement).src = `data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Crect fill='%23${bgColor}' width='200' height='200' rx='12'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-family='Arial' font-size='14' font-weight='bold'%3E${encodeURIComponent(product.name.substring(0, 10))}%3C/text%3E%3C/svg%3E`;
                       }}
@@ -204,7 +195,6 @@ export default function Index() {
                       <span className="text-2xl font-display font-medium">{product.price.toLocaleString()} F CFA</span>
                     </div>
                   </div>
-                </div>
                 </Link>
               </div>
             ))
@@ -226,5 +216,3 @@ export default function Index() {
     </>
   );
 }
-
-export default Index;

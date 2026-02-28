@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ChevronLeft, ChevronRight, Play, Package } from "lucide-react";
 
 interface ProductGalleryProps {
-  images: Record<string, string[]>; // { "argent": ["url1", "url2"], "doré": ["url1", "url2"] }
+  images: Record<string, string[]>;
   selectedColor: string;
   packagingImage?: string;
   videoUrl?: string;
@@ -17,19 +17,18 @@ export default function ProductGallery({
   productName 
 }: ProductGalleryProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const touchStartX = useRef<number | null>(null);
+  const touchEndX = useRef<number | null>(null);
   const currentImages = images[selectedColor] || [];
   
-  // Calculer l'image actuelle en fonction de l'index
   const getCurrentImage = () => {
     const videoOffset = videoUrl ? 1 : 0;
     const packagingIndex = currentImages.length + videoOffset;
     
-    // Si c'est l'index du packaging
     if (packagingImage && currentImageIndex === packagingIndex) {
       return `/Images/${packagingImage}`;
     }
     
-    // Si c'est une image normale du produit
     const productImageIndex = videoUrl ? currentImageIndex - 1 : currentImageIndex;
     if (productImageIndex >= 0 && productImageIndex < currentImages.length) {
       return `/Images/${currentImages[productImageIndex]}`;
@@ -39,25 +38,40 @@ export default function ProductGallery({
   };
   
   const currentImage = getCurrentImage();
+  const totalImages = currentImages.length + (videoUrl ? 1 : 0) + (packagingImage ? 1 : 0);
+  const hasMultiple = totalImages > 1;
 
-  const nextImage = () => {
-    const totalImages = currentImages.length + (videoUrl ? 1 : 0) + (packagingImage ? 1 : 0);
-    setCurrentImageIndex((prev) => (prev + 1) % totalImages);
+  const nextImage = () => setCurrentImageIndex((prev) => (prev + 1) % totalImages);
+  const prevImage = () => setCurrentImageIndex((prev) => (prev - 1 + totalImages) % totalImages);
+  const selectImage = (index: number) => setCurrentImageIndex(index);
+
+  // Swipe tactile
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
   };
-
-  const prevImage = () => {
-    const totalImages = currentImages.length + (videoUrl ? 1 : 0) + (packagingImage ? 1 : 0);
-    setCurrentImageIndex((prev) => (prev - 1 + totalImages) % totalImages);
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.touches[0].clientX;
   };
-
-  const selectImage = (index: number) => {
-    setCurrentImageIndex(index);
+  const handleTouchEnd = () => {
+    if (touchStartX.current === null || touchEndX.current === null) return;
+    const diff = touchStartX.current - touchEndX.current;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) nextImage();
+      else prevImage();
+    }
+    touchStartX.current = null;
+    touchEndX.current = null;
   };
 
   return (
     <div className="space-y-4">
       {/* Main image/video */}
-      <div className="relative aspect-square bg-secondary rounded-sm overflow-hidden group">
+      <div
+        className="relative aspect-square bg-secondary rounded-sm overflow-hidden group"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
         {videoUrl && currentImageIndex === 0 ? (
           <video
             src={videoUrl}
@@ -66,7 +80,7 @@ export default function ProductGallery({
             loop
             playsInline
             className="w-full h-full object-cover"
-            poster={currentImage}
+            poster={currentImage || undefined}
           />
         ) : (
           <img 
@@ -75,25 +89,26 @@ export default function ProductGallery({
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             loading="lazy"
             onError={(e) => {
-              // Fallback to placeholder on error
               (e.target as HTMLImageElement).src = `data:image/svg+xml,%3Csvg width='400' height='400' xmlns='http://www.w3.org/2000/svg'%3E%3Crect fill='%23f0f0f0' width='400' height='400'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-family='Arial' font-size='16'%3EImage non disponible%3C/text%3E%3C/svg%3E`;
             }}
           />
         )}
         
-        {/* Navigation arrows */}
-        {currentImages.length > 1 || packagingImage && (
+        {/* Flèches : toujours visibles sur mobile, hover sur desktop */}
+        {hasMultiple && (
           <>
             <button
               onClick={prevImage}
-              className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors opacity-0 group-hover:opacity-100"
+              className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors
+                         md:opacity-0 md:group-hover:opacity-100 opacity-100"
               aria-label="Image précédente"
             >
               <ChevronLeft size={16} />
             </button>
             <button
               onClick={nextImage}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors opacity-0 group-hover:opacity-100"
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors
+                         md:opacity-0 md:group-hover:opacity-100 opacity-100"
               aria-label="Image suivante"
             >
               <ChevronRight size={16} />
@@ -122,7 +137,6 @@ export default function ProductGallery({
               src={videoUrl}
               muted
               className="w-full h-full object-cover"
-              poster={currentImages[0]}
             />
             <div className="absolute inset-0 flex items-center justify-center">
               <Play size={20} className="text-white drop-shadow-lg" />
@@ -143,14 +157,12 @@ export default function ProductGallery({
               alt={`${productName} - ${selectedColor} ${index + 1}`}
               className="w-full h-full object-cover hover:scale-105 transition-transform"
               onError={(e) => {
-                // Fallback to placeholder on error
                 (e.target as HTMLImageElement).src = `data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Crect fill='%23f0f0f0' width='100' height='100'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-family='Arial' font-size='8'%3E%3F%3C/text%3E%3C/svg%3E`;
               }}
             />
           </button>
         ))}
 
-        {/* Packaging image */}
         {packagingImage && (
           <button
             onClick={() => selectImage(currentImages.length + (videoUrl ? 1 : 0))}
@@ -163,7 +175,6 @@ export default function ProductGallery({
               alt="Packaging du produit"
               className="w-full h-full object-cover hover:scale-105 transition-transform"
               onError={(e) => {
-                // Fallback to placeholder on error
                 (e.target as HTMLImageElement).src = `data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Crect fill='%23f0f0f0' width='100' height='100'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-family='Arial' font-size='8'%3E%3F%3C/text%3E%3C/svg%3E`;
               }}
             />
