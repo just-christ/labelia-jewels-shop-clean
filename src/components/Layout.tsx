@@ -4,7 +4,7 @@ import { useCart } from "@/context/CartContext";
 import { useState } from "react";
 import ContactModal from "@/components/ContactModal";
 import TikTokIcon from "@/components/TikTokIcon";
-import AnnouncementBar from "./AnnouncementBar";
+import AnnouncementBar from "@/components/AnnouncementBar";
 
 const navLinks = [
   { to: "/", label: "Accueil" },
@@ -20,11 +20,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen flex flex-col">
-
       <AnnouncementBar />
 
-      
-      <header className="fixed top-0 left-0 right-0 z-50 bg-background/90 backdrop-blur-md border-b">
+      <header className="fixed top-8 left-0 right-0 z-40 bg-background/90 backdrop-blur-md border-b">
         <div className="container mx-auto flex items-center justify-between h-16 px-4">
           <Link to="/" className="flex items-center gap-2">
             <img 
@@ -95,7 +93,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         )}
       </header>
 
-      <main className="flex-1 pt-16">{children}</main>
+      <main className="flex-1 pt-24">{children}</main>
 
       <footer className="border-t bg-secondary/50 mt-20">
         <div className="container mx-auto px-4 py-12">
@@ -126,7 +124,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <div>
               <h4 className="font-medium text-sm mb-3">Suivez-nous</h4>
               <div className="flex gap-4 mb-4">
-                <a
+                
                   href="https://instagram.com/labelia_"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -135,7 +133,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 >
                   <Instagram size={18} />
                 </a>
-                <a
+                
                   href="https://tiktok.com/@labelia_225"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -144,7 +142,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 >
                   <TikTokIcon size={18} />
                 </a>
-                <a
+                
                   href="mailto:labelia.civ@gmail.com"
                   className="text-muted-foreground hover:text-primary transition-colors"
                   aria-label="Email"
@@ -166,7 +164,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </div>
       </footer>
 
-      {/* Contact Modal */}
       <ContactModal open={contactModalOpen} onOpenChange={setContactModalOpen} />
     </div>
   );
