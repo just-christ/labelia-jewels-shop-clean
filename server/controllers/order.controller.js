@@ -55,7 +55,7 @@ export const updateOrderStatus = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
-    if (!['en_attente', 'payée', 'expédiée'].includes(status)) {
+    if (!['en_attente', 'payée', 'expédiée', 'pending', 'paid', 'shipped'].includes(status)) {
       return res.status(400).json({ error: 'Invalid status' });
     }
 
@@ -67,6 +67,21 @@ export const updateOrderStatus = async (req, res) => {
     res.json(order);
   } catch (error) {
     console.error('Update order status error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const deleteOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const order = await prisma.order.delete({
+      where: { id }
+    });
+
+    res.json({ message: 'Order deleted successfully', order });
+  } catch (error) {
+    console.error('Delete order error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { apiClient } from "@/lib/api";
 import { toast } from "sonner";
-import { Download } from "lucide-react";
+import { Download, Trash2 } from "lucide-react";
 
 interface Order {
   id: string;
@@ -50,6 +50,21 @@ export default function AdminOrders() {
       fetchOrders();
     } catch (error) {
       toast.error("Erreur lors de la mise à jour du statut");
+    }
+  };
+
+  const deleteOrder = async (id: string) => {
+    const token = localStorage.getItem('authToken');
+    if (!token || !user) return;
+
+    if (!confirm("Êtes-vous sûr de vouloir supprimer cette commande ?")) return;
+
+    try {
+      await apiClient.deleteOrder(id, token);
+      toast.success("Commande supprimée !");
+      fetchOrders();
+    } catch (error) {
+      toast.error("Erreur lors de la suppression de la commande");
     }
   };
 
@@ -109,6 +124,13 @@ export default function AdminOrders() {
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
                   <span>{order.total} F CFA</span>
                   <span>{new Date(order.createdAt).toLocaleDateString("fr-FR")}</span>
+                  <button
+                    onClick={() => deleteOrder(order.id)}
+                    className="p-1.5 text-red-600 hover:bg-red-50 rounded-sm transition-colors"
+                    title="Supprimer la commande"
+                  >
+                    <Trash2 size={14} />
+                  </button>
                 </div>
               </button>
 

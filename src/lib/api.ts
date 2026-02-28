@@ -99,6 +99,15 @@ class ApiClient {
     });
   }
 
+  async deleteOrder(id: string, token: string) {
+    return this.request(`/orders/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+  }
+
   // Customers
   async getCustomers(token: string) {
     return this.request('/customers', {
