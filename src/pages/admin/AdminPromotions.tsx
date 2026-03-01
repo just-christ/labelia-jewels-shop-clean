@@ -259,8 +259,8 @@ export default function AdminPromotions() {
             <div className="space-y-4">
               {promotions.map((promotion) => (
                 <div key={promotion.id} className="border rounded-lg p-4 bg-card">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
+                  <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
+                    <div className="flex-1">
                       <h3 className="font-display text-lg font-medium">{promotion.code}</h3>
                       <p className="text-sm text-muted-foreground mt-1">{promotion.description}</p>
                       <p className="text-sm font-medium">
@@ -273,24 +273,24 @@ export default function AdminPromotions() {
                       </p>
                     </div>
                     
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       <button
                         onClick={() => handleEdit(promotion)}
-                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        className="px-3 py-2 text-xs text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                       >
                         Modifier
                       </button>
                       
                       <button
                         onClick={() => handleDelete(promotion.id)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        className="px-3 py-2 text-xs text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       >
                         Supprimer
                       </button>
                       
                       <button
                         onClick={() => toggleActive(promotion.id, promotion.active)}
-                        className={`p-2 rounded-lg transition-colors ${
+                        className={`px-3 py-2 text-xs rounded-lg transition-colors ${
                           promotion.active 
                             ? "bg-green-500 text-white hover:bg-green-600" 
                             : "bg-gray-200 text-gray-800 hover:bg-gray-300"
