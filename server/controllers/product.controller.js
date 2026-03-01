@@ -32,27 +32,41 @@ export const getProductById = async (req, res) => {
 
 export const createProduct = async (req, res) => {
   try {
+    console.log('Create product request body:', JSON.stringify(req.body, null, 2));
+    
     const { name, description, price, category, colors, sizes, stock, images, packagingImage, videoUrl } = req.body;
     
+    // Validation des champs requis
+    if (!name || !price || !category) {
+      console.log('Missing required fields:', { name, price, category });
+      return res.status(400).json({ error: 'Missing required fields: name, price, category' });
+    }
+    
+    const productData = {
+      name,
+      description: description || '',
+      price: parseFloat(price),
+      category,
+      colors: colors || ['argent'],
+      sizes: sizes || [],
+      stock: parseInt(stock) || 0,
+      images: images || {},
+      packagingImage: packagingImage || '',
+      videoUrl: videoUrl || ''
+    };
+    
+    console.log('Processed product data:', JSON.stringify(productData, null, 2));
+    
     const product = await prisma.product.create({
-      data: {
-        name,
-        description: description || '',
-        price: parseFloat(price),
-        category,
-        colors: colors || ['argent', 'doré'],
-        sizes: sizes || [],
-        stock: parseInt(stock) || 0,
-        images: images || [],
-        packagingImage: packagingImage || '',
-        videoUrl: videoUrl || ''
-      }
+      data: productData
     });
     
+    console.log('Product created successfully:', product.id);
     res.status(201).json(product);
   } catch (error) {
     console.error('Create product error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Error stack:', error.stack);
+    res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 };
 

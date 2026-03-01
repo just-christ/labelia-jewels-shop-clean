@@ -1,16 +1,22 @@
 import express from 'express';
 import { uploadSingle, deleteImage } from '../middleware/upload.js';
+import { authenticateToken, requireAdmin } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
-// Route pour uploader une seule image
-router.post('/single', uploadSingle, (req, res) => {
+// Route pour uploader une seule image (admin uniquement)
+router.post('/single', authenticateToken, requireAdmin, uploadSingle, (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'Aucun fichier fourni' });
     }
 
-    const imageUrl = `http://localhost:5000/uploads/${req.file.filename}`;
+    // URL dynamique selon l'environnement
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://labelia-backend.onrender.com'
+      : 'http://localhost:5000';
+    
+    const imageUrl = `${baseUrl}/uploads/${req.file.filename}`;
     
     res.json({
       message: 'Image uploadée avec succès',

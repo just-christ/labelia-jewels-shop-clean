@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Mail, Instagram } from "lucide-react";
 import TikTokIcon from "@/components/TikTokIcon";
 
@@ -13,6 +13,9 @@ export default function ContactModal({ open, onOpenChange }: Props) {
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="font-display text-xl">Nous contacter</DialogTitle>
+          <DialogDescription>
+            Contactez-nous par email ou suivez-nous sur nos réseaux sociaux
+          </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-6">

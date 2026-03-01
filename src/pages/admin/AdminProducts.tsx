@@ -4,6 +4,7 @@ import { apiClient } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Pencil, Trash2, Plus, X, Check, ChevronDown, ChevronUp, Image as ImageIcon } from "lucide-react";
+import ImageUpload from "@/components/ImageUpload";
 
 interface Product {
   id: string;
@@ -576,6 +577,25 @@ export default function AdminProducts() {
                     setForm({ ...form, images: { ...form.images, [color]: imgs } })
                   }
                 />
+              ))}
+            </div>
+
+            {/* Upload d'images personnalisées */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium">Uploader vos propres images</label>
+              <p className="text-xs text-muted-foreground">Ajoutez vos propres images si celles disponibles ne vous conviennent pas</p>
+              {["argent", "doré"].map((color) => (
+                <div key={color} className="space-y-2">
+                  <h4 className="text-sm font-medium capitalize">Images {color}</h4>
+                  <ImageUpload
+                    initialImages={form.images[color] || []}
+                    onImagesChange={(imgs) =>
+                      setForm({ ...form, images: { ...form.images, [color]: imgs } })
+                    }
+                    maxImages={5}
+                    label={`Images ${color}`}
+                  />
+                </div>
               ))}
             </div>
 
