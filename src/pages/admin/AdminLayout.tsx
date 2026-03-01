@@ -1,6 +1,6 @@
 import { Navigate, Outlet, Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { Package, ShoppingCart, Users, LogOut, LayoutDashboard, Menu, X } from "lucide-react";
+import { Package, ShoppingCart, Users, LogOut, LayoutDashboard, Menu, X, Tag } from "lucide-react";
 import { useState } from "react";
 
 const adminLinks = [
@@ -8,6 +8,7 @@ const adminLinks = [
   { to: "/admin/produits", label: "Produits", icon: Package },
   { to: "/admin/commandes", label: "Commandes", icon: ShoppingCart },
   { to: "/admin/clients", label: "Clients", icon: Users },
+  { to: "/admin/promotions", label: "Promotions", icon: Tag },
 ];
 
 export default function AdminLayout() {

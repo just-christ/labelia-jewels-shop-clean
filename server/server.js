@@ -178,12 +178,10 @@ async function initializeDatabase() {
     }
 
     // Produits (créés seulement s'ils n'existent pas)
-    const productsCount = await prisma.$queryRaw`
-      SELECT COUNT(*) as count FROM products
-    `;
+    const productsCount = await prisma.product.count();
 
     // FORCER LA MISE À JOUR du collier Lys (prod-5)
-    if (productsCount[0]?.count > 0) {
+    if (productsCount > 0) {
       console.log('🔄 Updating collier Lys with correct image names...');
       await prisma.product.update({
         where: { id: 'prod-5' },
