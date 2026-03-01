@@ -139,7 +139,8 @@ export default function ImageUpload({
                     alt={`Image ${index + 1}`}
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      e.currentTarget.src = '/placeholder-image.jpg';
+                      // Utiliser un placeholder SVG inline au lieu d'une image qui n'existe pas
+                      e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Crect fill='%23eee' width='60' height='60'/%3E%3C/svg%3E";
                     }}
                   />
                 </div>
