@@ -91,7 +91,9 @@ export default function AdminPromotions() {
     if (!confirm("Supprimer cette promotion ?")) return;
     
     try {
-      await apiClient.deletePromotion(id);
+      const token = localStorage.getItem("authToken");
+      if (!token) return toast.error("Token manquant");
+      await apiClient.deletePromotion(id, token);
       toast.success("Promotion supprimée !");
       fetchPromotions();
     } catch (error) {
@@ -99,14 +101,29 @@ export default function AdminPromotions() {
     }
   };
 
-  const toggleActive = async (id: string) => {
+  const toggleActive = async (id: string, currentActive: boolean) => {
     try {
-      await apiClient.updatePromotion(id, { active: false });
-      toast.success("Promotion désactivée !");
+      const token = localStorage.getItem("authToken");
+      if (!token) return toast.error("Token manquant");
+      await apiClient.updatePromotion(id, { active: !currentActive }, token);
+      toast.success(currentActive ? "Promotion désactivée !" : "Promotion activée !");
       fetchPromotions();
     } catch (error) {
       toast.error("Erreur lors de la mise à jour");
     }
+  };
+
+  const handleEdit = (promotion: Promotion) => {
+    setEditingId(promotion.id);
+    setForm({
+      code: promotion.code,
+      description: promotion.description || "",
+      discount: promotion.discount.toString(),
+      isPercentage: promotion.isPercentage,
+      active: promotion.active,
+      startDate: promotion.startDate ? new Date(promotion.startDate).toISOString().split('T')[0] : "",
+      endDate: promotion.endDate ? new Date(promotion.endDate).toISOString().split('T')[0] : ""
+    });
   };
 
   return (
@@ -116,9 +133,30 @@ export default function AdminPromotions() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Formulaire */}
         <div className="bg-card p-6 rounded-xl border">
-          <h2 className="font-display text-2xl font-semibold mb-6">
-            {editingId ? "Modifier la promotion" : "Nouvelle promotion"}
-          </h2>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="font-display text-2xl font-semibold">
+              {editingId ? "Modifier la promotion" : "Nouvelle promotion"}
+            </h2>
+            {editingId && (
+              <button
+                onClick={() => {
+                  setEditingId(null);
+                  setForm({
+                    code: "",
+                    description: "",
+                    discount: "",
+                    isPercentage: true,
+                    active: true,
+                    startDate: "",
+                    endDate: ""
+                  });
+                }}
+                className="px-4 py-2 text-sm bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors"
+              >
+                Nouvelle promotion
+              </button>
+            )}
+          </div>
           
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -237,6 +275,13 @@ export default function AdminPromotions() {
                     
                     <div className="flex gap-2">
                       <button
+                        onClick={() => handleEdit(promotion)}
+                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                      >
+                        Modifier
+                      </button>
+                      
+                      <button
                         onClick={() => handleDelete(promotion.id)}
                         className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       >
@@ -244,7 +289,7 @@ export default function AdminPromotions() {
                       </button>
                       
                       <button
-                        onClick={() => toggleActive(promotion.id)}
+                        onClick={() => toggleActive(promotion.id, promotion.active)}
                         className={`p-2 rounded-lg transition-colors ${
                           promotion.active 
                             ? "bg-green-500 text-white hover:bg-green-600" 
