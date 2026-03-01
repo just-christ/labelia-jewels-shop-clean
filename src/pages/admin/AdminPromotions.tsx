@@ -56,11 +56,17 @@ export default function AdminPromotions() {
     if (!user) return;
     
     try {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        toast.error("Token d'authentification manquant");
+        return;
+      }
+      
       if (editingId) {
-        await apiClient.updatePromotion(editingId, form);
+        await apiClient.updatePromotion(editingId, form, token);
         toast.success("Promotion mise à jour !");
       } else {
-        await apiClient.createPromotion(form);
+        await apiClient.createPromotion(form, token);
         toast.success("Promotion créée !");
       }
       
