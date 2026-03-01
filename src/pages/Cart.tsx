@@ -32,7 +32,9 @@ export default function Cart() {
           >
             <div className="w-20 h-20 bg-secondary rounded-sm overflow-hidden flex-shrink-0">
               <img
-                src={item.product.images[item.color]?.[0] || `data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Crect fill='%23C0C0C0' width='200' height='200' rx='12'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-family='Arial' font-size='14' font-weight='bold'%3E${encodeURIComponent(item.product.name.substring(0, 10))}%3C/text%3E%3C/svg%3E`}
+                src={item.product.images[item.color]?.[0] 
+                  ? `https://labelia-backend.onrender.com/uploads/${item.product.images[item.color][0]}` 
+                  : `data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Crect fill='%23C0C0C0' width='200' height='200' rx='12'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-family='Arial' font-size='14' font-weight='bold'%3E${encodeURIComponent(item.product.name.substring(0, 10))}%3C/text%3E%3C/svg%3E`}
                 alt={item.product.name}
                 className="w-full h-full object-cover"
                 loading="lazy"
