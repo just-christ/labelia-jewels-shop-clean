@@ -9,6 +9,7 @@ import productRoutes from './routes/product.routes.js';
 import orderRoutes from './routes/order.routes.js';
 import customerRoutes from './routes/customer.routes.js';
 import uploadRoutes from './routes/upload.routes.js';
+import promotionRoutes from './routes/promotion.routes.js';
 import path from 'path';
 
 dotenv.config();
