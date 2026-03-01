@@ -200,7 +200,7 @@ export default function AdminPromotions() {
               type="submit"
               className="w-full py-3 text-sm font-medium bg-btn text-btn-foreground hover:bg-btn-hover rounded-lg transition-colors"
             >
-              {form.code ? "Mettre à jour" : "Créer la promotion"}
+              {editingId ? "Mettre à jour" : "Créer la promotion"}
             </button>
           </form>
         </div>
