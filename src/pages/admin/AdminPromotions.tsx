@@ -18,6 +18,7 @@ interface Promotion {
 export default function AdminPromotions() {
   const [promotions, setPromotions] = useState<Promotion[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({
     code: "",
     description: "",
@@ -55,8 +56,8 @@ export default function AdminPromotions() {
     if (!user) return;
     
     try {
-      if (form.code) {
-        await apiClient.updatePromotion(form.code, form);
+      if (editingId) {
+        await apiClient.updatePromotion(editingId, form);
         toast.success("Promotion mise à jour !");
       } else {
         await apiClient.createPromotion(form);
@@ -73,6 +74,7 @@ export default function AdminPromotions() {
         endDate: ""
       });
       
+      setEditingId(null);
       fetchPromotions();
     } catch (error) {
       toast.error("Erreur lors de la sauvegarde");
@@ -109,7 +111,7 @@ export default function AdminPromotions() {
         {/* Formulaire */}
         <div className="bg-card p-6 rounded-xl border">
           <h2 className="font-display text-2xl font-semibold mb-6">
-            {form.code ? "Modifier la promotion" : "Nouvelle promotion"}
+            {editingId ? "Modifier la promotion" : "Nouvelle promotion"}
           </h2>
           
           <form onSubmit={handleSubmit} className="space-y-4">
