@@ -54,7 +54,7 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/promotions', promotionRoutes);
 
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString(), version: '1.1' });
+  res.json({ status: 'OK', timestamp: new Date().toISOString(), version: '1.2' });
 });
 
 async function initializeDatabase() {
