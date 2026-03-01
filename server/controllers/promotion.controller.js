@@ -25,6 +25,7 @@ export const getPromotions = async (req, res) => {
 
 export const createPromotion = async (req, res) => {
   try {
+    console.log('📦 Body reçu:', req.body);
     const { code, description, discount, isPercentage, startDate, endDate } = req.body;
     
     // Validation
@@ -32,7 +33,7 @@ export const createPromotion = async (req, res) => {
       return res.status(400).json({ error: 'Code promotion requis' });
     }
     
-    if (discount === undefined || discount === null) {
+    if (discount === undefined || discount === null || discount === "" || isNaN(parseFloat(discount))) {
       return res.status(400).json({ error: 'Montant de réduction requis' });
     }
     

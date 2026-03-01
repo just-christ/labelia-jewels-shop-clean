@@ -199,7 +199,7 @@ export default function AdminPromotions() {
               <input
                 type="number"
                 value={form.discount}
-                onChange={(e) => setForm({ ...form, discount: parseFloat(e.target.value) })}
+                onChange={(e) => setForm({ ...form, discount: e.target.value })}
                 placeholder={form.isPercentage ? "ex: 10" : "ex: 5000"}
                 className="w-full border rounded-lg px-4 py-3 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground"
                 required
