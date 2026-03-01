@@ -59,7 +59,7 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/promotions', promotionRoutes);
 
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+  res.json({ status: 'OK', timestamp: new Date().toISOString(), version: '1.1' });
 });
 
 async function initializeDatabase() {
@@ -149,6 +149,32 @@ async function initializeDatabase() {
       console.log('✅ Admin user created');
     } else {
       console.log('✅ Admin user already exists');
+    }
+
+    // Vérifier si la table promotions existe
+    const promotionsCount = await prisma.$queryRaw`
+      SELECT COUNT(*) as count FROM information_schema.tables 
+      WHERE table_name = 'promotions'
+    `;
+    
+    if (promotionsCount[0]?.count === 0) {
+      console.log('🌱 Creating promotions table...');
+      await prisma.$executeRaw`
+        CREATE TABLE promotions (
+          id TEXT PRIMARY KEY,
+          code TEXT UNIQUE NOT NULL,
+          description TEXT,
+          discount FLOAT NOT NULL,
+          isPercentage BOOLEAN DEFAULT true,
+          active BOOLEAN DEFAULT true,
+          startDate TIMESTAMP,
+          endDate TIMESTAMP,
+          createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+      console.log('✅ Promotions table created!');
+    } else {
+      console.log('✅ Promotions table already exists');
     }
 
     // Produits (créés seulement s'ils n'existent pas)
