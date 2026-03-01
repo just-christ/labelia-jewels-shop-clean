@@ -35,7 +35,7 @@ export function generateReceipt(data: ReceiptData): void {
 
   // ── Helpers ─────────────────────────────────────────────────────────────
   const separator = () => {
-    doc.setDrawColor(180, 160, 120);
+    doc.setDrawColor(230, 126, 173); // Rose primaire du site (#FF6B9B)
     doc.setLineWidth(0.4);
     doc.line(marginX, y, W - marginX, y);
     y += 6;
@@ -61,7 +61,7 @@ export function generateReceipt(data: ReceiptData): void {
   // Bloc logo texte
   text("LABELIA", W / 2, 22, "bold", "center", [20, 20, 20]);
   nl(8);
-  text("Bijoux en Acier Inoxydable", W / 2, 9, "italic", "center", [120, 100, 60]);
+  text("Bijoux en Acier Inoxydable", W / 2, 9, "italic", "center", [230, 126, 173]);
   nl(8);
   separator();
 
@@ -83,7 +83,7 @@ export function generateReceipt(data: ReceiptData): void {
   separator();
 
   // ── CLIENT ───────────────────────────────────────────────────────────────
-  text("CLIENT", marginX, 10, "bold", "left", [120, 100, 60]);
+  text("CLIENT", marginX, 10, "bold", "left", [230, 126, 173]);
   nl(6);
   text(data.customerName, marginX, 11, "bold");
   nl(6);
@@ -96,7 +96,7 @@ export function generateReceipt(data: ReceiptData): void {
   separator();
 
   // ── DÉTAIL DES BIJOUX ────────────────────────────────────────────────────
-  text("DÉTAIL DES BIJOUX", marginX, 10, "bold", "left", [120, 100, 60]);
+  text("DÉTAIL DES BIJOUX", marginX, 10, "bold", "left", [230, 126, 173]);
   nl(7);
 
   // En-têtes colonnes
@@ -121,7 +121,7 @@ export function generateReceipt(data: ReceiptData): void {
     doc.setTextColor(30, 30, 30);
     doc.text(label, marginX, y);
     doc.text(`${item.quantity}`, 140, y, { align: "center" });
-    doc.text(`${lineTotal.toLocaleString("fr-FR")} FCFA`, W - marginX, y, { align: "right" });
+    doc.text(`${lineTotal.toLocaleString("fr-FR", { useGrouping: false })} FCFA`, W - marginX, y, { align: "right" });
     nl(6);
   });
 
@@ -129,7 +129,7 @@ export function generateReceipt(data: ReceiptData): void {
   separator();
 
   // ── RÉCAPITULATIF ────────────────────────────────────────────────────────
-  text("RÉCAPITULATIF", marginX, 10, "bold", "left", [120, 100, 60]);
+  text("RÉCAPITULATIF", marginX, 10, "bold", "left", [230, 126, 173]);
   nl(7);
 
   const row = (label: string, value: string, bold = false, color: [number,number,number] = [30,30,30]) => {
@@ -149,13 +149,13 @@ export function generateReceipt(data: ReceiptData): void {
     nl(6);
   };
 
-  row("Sous-total", `${data.subtotal.toLocaleString("fr-FR")} FCFA`);
+  row("Sous-total", `${data.subtotal.toLocaleString("fr-FR", { useGrouping: false })} FCFA`);
 
   const discountAmount = Number(data.discount) || 0;
   if (discountAmount > 0) {
     row(
       `Reduction ${data.discountLabel || ""}`,  // ← pas d'accent (encodage safe)
-      `-${discountAmount.toLocaleString("fr-FR")} FCFA`,
+      `-${discountAmount.toLocaleString("fr-FR", { useGrouping: false })} FCFA`,
       false,
       [180, 60, 60]
     );
@@ -171,19 +171,19 @@ export function generateReceipt(data: ReceiptData): void {
   doc.setFont("helvetica", "bold");
   doc.setTextColor(20, 20, 20);
   doc.text("TOTAL PAYÉ :", marginX + 4, y + 4);
-  doc.text(`${data.total.toLocaleString("fr-FR")} FCFA`, W - marginX - 4, y + 4, { align: "right" });
+  doc.text(`${data.total.toLocaleString("fr-FR", { useGrouping: false })} FCFA`, W - marginX - 4, y + 4, { align: "right" });
   y += 16;
   separator();
 
   // ── PAIEMENT ─────────────────────────────────────────────────────────────
-  text("PAIEMENT", marginX, 10, "bold", "left", [120, 100, 60]);
+  text("PAIEMENT", marginX, 10, "bold", "left", [230, 126, 173]);
   nl(6);
   text("À la livraison", marginX, 10);
   nl(7);
   separator();
 
   // ── MESSAGE LABELIA ──────────────────────────────────────────────────────
-  text("MESSAGE LABELIA", marginX, 10, "bold", "left", [120, 100, 60]);
+  text("MESSAGE LABELIA", marginX, 10, "bold", "left", [230, 126, 173]);
   nl(7);
 
   const message = [
@@ -202,7 +202,7 @@ export function generateReceipt(data: ReceiptData): void {
   separator();
 
   // Pied de page
-  text("labelia-jewel.com  ·  labelia.civ@gmail.com", W / 2, 8, "normal", "center", [160, 140, 100]);
+  text("labelia-jewel.com  ·  labelia.civ@gmail.com", W / 2, 8, "normal", "center", [230, 126, 173]);
 
   // ── TÉLÉCHARGEMENT ───────────────────────────────────────────────────────
   doc.save(`Recu_Labelia_${data.orderNumber}.pdf`);
