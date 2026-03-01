@@ -101,7 +101,7 @@ export default function ProductDetail() {
       ...product,
       category: product.category as any, // Cast to any to avoid type issues
       colors: product.colors as any[], // Cast string[] to Color[]
-      images: {} as any // Empty object for now since we don't have images
+      images: product.images as any // Pass actual images data
     };
     addItem(cartProduct, selectedColor, selectedSize);
     toast.success(`${product.name} ajouté au panier !`);

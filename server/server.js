@@ -180,7 +180,7 @@ async function initializeDatabase() {
         colors: ['argent'],
         sizes: ['7'],
         stock: 10,
-        images: { argent: ['JH0A9575.jpg', 'JH0A9678.jpg', 'JH0A9690.jpg'] },
+        images: { argent: ['JH0A1768_1.jpg', 'JH0A1768_2.jpg', 'JH0A1768_3.jpg'] },
         packagingImage: 'packaging.png',
         videoUrl: ''
       },
@@ -193,7 +193,7 @@ async function initializeDatabase() {
         colors: ['argent'],
         sizes: ['6', '7'],
         stock: 8,
-        images: { argent: ['JH0A3163_3.jpg', 'JH0A3163_4.jpg', 'JH0A3163_2.jpg'] },
+        images: { argent: ['JH0A3163_1.jpg', 'JH0A3163_2.jpg', 'JH0A3163_3.jpg', 'JH0A3163_4.jpg', 'JH0A3163_5.jpg'] },
         packagingImage: 'packaging.png',
         videoUrl: ''
       },

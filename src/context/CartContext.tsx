@@ -38,8 +38,13 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Sauvegarder le panier dans localStorage à chaque modification
   useEffect(() => {
-    if (typeof window !== 'undefined' && items.length > 0) {
-      localStorage.setItem('labelia-cart', JSON.stringify(items));
+    if (typeof window !== 'undefined') {
+      if (items.length > 0) {
+        localStorage.setItem('labelia-cart', JSON.stringify(items));
+      } else {
+        // Toujours supprimer du localStorage quand le panier est vide
+        localStorage.removeItem('labelia-cart');
+      }
     }
   }, [items]);
 
