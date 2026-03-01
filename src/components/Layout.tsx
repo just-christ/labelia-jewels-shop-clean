@@ -10,6 +10,10 @@ const navLinks = [
   { to: "/", label: "Accueil" },
   { to: "/produits", label: "Produits" },
   { to: "/a-propos", label: "À propos" },
+  { to: "/admin/orders", label: "Commandes" },
+  { to: "/admin/products", label: "Produits" },
+  { to: "/admin/promotions", label: "Promotions" },
+  { to: "/a-propos", label: "À propos" },
 ];
 
 export default function Layout({ children }: { children: React.ReactNode }) {

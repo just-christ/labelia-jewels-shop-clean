@@ -108,9 +108,55 @@ class ApiClient {
     });
   }
 
+  async deletePromotion(id: string, token: string) {
+    return this.request(`/promotions/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+  }
+
+  async updatePromotion(id: string, promotion: any, token: string) {
+    return this.request(`/promotions/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(promotion),
+    });
+  }
+
+  async createPromotion(promotion: any, token: string) {
+    return this.request('/promotions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(promotion),
+    });
+  }
+
+  async getPromotions(token: string) {
+    return this.request('/promotions', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+  }
+
+  async validatePromoCode(code: string) {
+    return this.request('/promotions/validate', {
+      method: 'POST',
+      body: JSON.stringify({ code }),
+    });
+  }
+
   // Customers
   async getCustomers(token: string) {
     return this.request('/customers', {
+      method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
       },

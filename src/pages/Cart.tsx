@@ -1,9 +1,43 @@
 import { useCart } from "@/context/CartContext";
 import { Link } from "react-router-dom";
 import { Minus, Plus, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { Tag } from "lucide-react";
+import { apiClient } from "@/lib/api";
+import { toast } from "sonner";
 
 export default function Cart() {
   const { items, updateQuantity, removeItem, totalPrice } = useCart();
+  const [promoCode, setPromoCode] = useState("");
+  const [discount, setDiscount] = useState(0);
+
+  const handleApplyPromoCode = async () => {
+    if (!promoCode.trim()) {
+      toast.error("Veuillez entrer un code promo");
+      return;
+    }
+    
+    try {
+      const response = await apiClient.validatePromoCode(promoCode);
+      
+      if (response.valid) {
+        // Calculer la réduction
+        let discountAmount = 0;
+        if (response.promotion.isPercentage) {
+          discountAmount = (totalPrice * response.promotion.discount) / 100;
+        } else {
+          discountAmount = response.promotion.discount;
+        }
+        
+        setDiscount(discountAmount);
+        toast.success(`Code promo appliqué : -${discountAmount.toLocaleString()} F CFA`);
+      } else {
+        toast.error(response.message || "Code promo invalide");
+      }
+    } catch (error) {
+      toast.error("Erreur lors de la validation du code promo");
+    }
+  };
 
   if (items.length === 0) {
     return (
@@ -73,9 +107,50 @@ export default function Cart() {
       </div>
 
       <div className="border-t mt-8 pt-6">
-        <div className="flex justify-between items-center mb-6">
-          <span className="font-display text-xl font-medium">Total</span>
-          <span className="font-display text-2xl font-semibold">{totalPrice.toLocaleString()} F CFA</span>
+        {/* Promo Code Section */}
+        <div className="mb-6">
+          <div className="flex gap-2 mb-4">
+            <div className="flex-1 relative">
+              <Tag size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <input
+                type="text"
+                value={promoCode}
+                onChange={(e) => setPromoCode(e.target.value)}
+                placeholder="Code promo"
+                className="w-full pl-10 pr-4 py-3 border rounded-lg text-sm bg-background focus:outline-none focus:ring-1 focus:ring-primary"
+              />
+            </div>
+            <button
+              onClick={handleApplyPromoCode}
+              className="px-6 py-3 text-sm font-medium bg-btn text-btn-foreground hover:bg-btn-hover rounded-lg transition-colors"
+            >
+              Appliquer
+            </button>
+          </div>
+          
+          {discount > 0 && (
+            <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
+              <span className="text-sm font-medium text-green-800">Réduction appliquée</span>
+              <span className="text-sm font-semibold text-green-800">-{discount.toLocaleString()} F CFA</span>
+            </div>
+          )}
+        </div>
+
+        {/* Total Section */}
+        <div className="space-y-2">
+          {discount > 0 && (
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-muted-foreground">Sous-total</span>
+              <span className="font-medium">{totalPrice.toLocaleString()} F CFA</span>
+            </div>
+          )}
+          
+          <div className="flex justify-between items-center mb-6">
+            <span className="font-display text-xl font-medium">Total</span>
+            <span className="font-display text-2xl font-semibold">
+              {(totalPrice - discount).toLocaleString()} F CFA
+            </span>
+          </div>
         </div>
         <Link
           to="/checkout"

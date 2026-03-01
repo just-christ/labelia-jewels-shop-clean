@@ -22,6 +22,7 @@ model Product {
   name           String
   description    String   @default("")
   price          Float
+  promoPrice     Float?   // Prix promo optionnel
   category       String
   colors         Json     @default("[]")
   sizes          Json     @default("[]")
@@ -29,6 +30,7 @@ model Product {
   images         Json     @default("{}")
   packagingImage String?
   videoUrl       String?
+  promotionId    String?   // Clé étrangère vers la promotion active
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   
@@ -49,4 +51,19 @@ model Order {
   updatedAt       DateTime @updatedAt
   
   @@map("orders")
+}
+
+model Promotion {
+  id          String   @id @default(uuid())
+  code        String   @unique
+  description String?
+  discount    Float    // Pourcentage ou montant fixe
+  isPercentage Boolean @default(true) // true = pourcentage, false = montant fixe
+  active      Boolean  @default(true)
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("promotions")
 }

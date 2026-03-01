@@ -46,7 +46,16 @@ const ProductCard = ({ product }: ProductCardProps) => {
           />
         </div>
         <h3 className="font-display text-lg font-medium group-hover:text-primary transition-colors">{product.name}</h3>
-        <p className="text-sm text-muted-foreground mt-0.5">{product.price} F CFA</p>
+        <div className="mt-0.5">
+          {product.promoPrice ? (
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground line-through">{product.price.toLocaleString()} F CFA</span>
+              <span className="text-sm font-semibold text-red-600">{product.promoPrice.toLocaleString()} F CFA</span>
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">{product.price.toLocaleString()} F CFA</p>
+          )}
+        </div>
         <button className="mt-2 w-full py-2.5 text-xs font-medium tracking-wider uppercase bg-btn text-btn-foreground hover:bg-btn-hover transition-colors rounded-sm">
           Voir
         </button>

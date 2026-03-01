@@ -20,6 +20,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminProducts from "./pages/admin/AdminProducts.tsx";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminClients from "./pages/admin/AdminClients";
+import AdminPromotions from "./pages/admin/AdminPromotions";
 import AdminProtectedRoute from "@/components/AdminProtectedRoute";
 import NotFound from "./pages/NotFound";
 
@@ -61,6 +62,7 @@ const App = () => (
                 <Route path="produits" element={<AdminProducts />} />
                 <Route path="commandes" element={<AdminOrders />} />
                 <Route path="clients" element={<AdminClients />} />
+                <Route path="promotions" element={<AdminPromotions />} />
               </Route>
               <Route path="/*" element={<PublicLayout />} />
             </Routes>
