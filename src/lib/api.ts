@@ -8,16 +8,16 @@ class ApiClient {
   }
 
   private async request(endpoint: string, options: RequestInit = {}) {
-    const url = `${this.baseURL}${endpoint}`;
+    const { headers, ...restOptions } = options;
     const config = {
       headers: {
         'Content-Type': 'application/json',
-        ...options.headers,
+        ...headers,
       },
-      ...options,
+      ...restOptions,
     };
 
-    const response = await fetch(url, config);
+    const response = await fetch(`${this.baseURL}${endpoint}`, config);
     
     if (!response.ok) {
       const error = await response.json().catch(() => ({}));
