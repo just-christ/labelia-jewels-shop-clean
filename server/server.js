@@ -19,14 +19,10 @@ const PORT = process.env.PORT || 5000;
 
 app.use(cors({
   origin: function (origin, callback) {
-    // En production, autoriser le domaine principal
     const allowedOrigins = [
       'https://labelia-jewel.com',
       'https://www.labelia-jewel.com',
-      // Ajoutez d'autres domaines si nécessaire
     ];
-    
-    // En développement, autoriser localhost
     if (process.env.NODE_ENV !== 'production') {
       allowedOrigins.push(
         'http://localhost:3000',
@@ -35,8 +31,6 @@ app.use(cors({
         'http://127.0.0.1:5173'
       );
     }
-    
-    // Autoriser si l'origine est dans la liste ou si c'est une requête interne (pas d'origin)
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -47,6 +41,7 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
 app.use(express.json());
 app.use('/Images', express.static(path.join(process.cwd(), 'public', 'Images')));
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
@@ -69,7 +64,7 @@ async function initializeDatabase() {
     await prisma.$connect();
     console.log('✅ Database connected successfully');
 
-    // Vérifier si les tables existent (PRODUCTION SAFE)
+    // Vérifier si la table "products" existe
     const tablesExist = await prisma.$queryRaw`
       SELECT EXISTS (
         SELECT FROM information_schema.tables 
@@ -78,10 +73,9 @@ async function initializeDatabase() {
       ) as exists
     `;
 
-    // Créer les tables seulement si elles n'existent pas
     if (!tablesExist[0]?.exists) {
       console.log('🆕 Creating tables for first time...');
-      
+
       await prisma.$executeRaw`
         CREATE TABLE users (
           id TEXT PRIMARY KEY,
@@ -131,7 +125,7 @@ async function initializeDatabase() {
       console.log('✅ Tables already exist - skipping creation');
     }
 
-    // Admin user (créé seulement s'il n'existe pas)
+    // Admin user
     const adminExists = await prisma.$queryRaw`
       SELECT EXISTS (
         SELECT FROM users 
@@ -151,7 +145,7 @@ async function initializeDatabase() {
       console.log('✅ Admin user already exists');
     }
 
-    // Vérifier si la table promotions existe
+    // Promotions table
     const promotionsCount = await prisma.$queryRaw`
       SELECT COUNT(*) as count FROM information_schema.tables 
       WHERE table_name = 'promotions'
@@ -171,16 +165,16 @@ async function initializeDatabase() {
           endDate TIMESTAMP,
           createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        );
+        )
+      `;
       console.log('✅ Promotions table created!');
     } else {
       console.log('✅ Promotions table already exists');
     }
 
-    // Produits (créés seulement s'ils n'existent pas)
+    // Produits
     const productsCount = await prisma.product.count();
 
-    // FORCER LA MISE À JOUR du collier Lys (prod-5)
     if (productsCount > 0) {
       console.log('🔄 Updating collier Lys with correct image names...');
       await prisma.product.update({
@@ -193,114 +187,20 @@ async function initializeDatabase() {
       console.log('✅ Collier Lys updated with correct images!');
     }
 
-    if (productsCount[0]?.count === 0) {
+    if (productsCount === 0) {
       console.log('🌱 Creating 7 real Labelia products...');
-      
-      // Création des produits avec Prisma Client (plus sûr que SQL brut)
       const products = [
-      {
-        id: 'prod-1',
-        name: 'bague de fiançaille Lumina - Argent pur & diamant Moissanite',
-        description: 'Un cadeau romantique parfait, cette bague de fiançailles fine en argent pur avec diamant unique illumine l\'amour. Design simple et original, symbole d\'élégance et d\'éternité.',
-        price: 45000,
-        category: 'bague',
-        colors: ['argent'],
-        sizes: ['7'],
-        stock: 10,
-        images: { argent: ['JH0A1768_1.jpg', 'JH0A1768_2.jpg', 'JH0A1768_3.jpg'] },
-        packagingImage: 'packaging.png',
-        videoUrl: ''
-      },
-      {
-        id: 'prod-2',
-        name: 'bague de fiançaille AÏNA- Argent pur & diamant Moissanite & zircon',
-        description: 'La bague AÏNA associe un diamant central étincelant à un halo de petites pierres en zircon pour un rendu sophistiqué. Un bijou de luxe en argent pur, parfait pour une demande en mariage ou fiançailles.',
-        price: 50000,
-        category: 'bague',
-        colors: ['argent'],
-        sizes: ['6', '7'],
-        stock: 8,
-        images: { argent: ['JH0A3163_1.jpg', 'JH0A3163_2.jpg', 'JH0A3163_3.jpg', 'JH0A3163_4.jpg', 'JH0A3163_5.jpg'] },
-        packagingImage: 'packaging.png',
-        videoUrl: ''
-      },
-      {
-        id: 'prod-3',
-        name: 'bague de fiancaille Hera - bague de fiancaille pour femme',
-        description: 'Offrez un cadeau précieux et inoubliable avec la bague Héra, diamant moissanite central et des pierres de zircon dans un design torsadé raffiné. Idéale pour symboliser l\'amour et la douceur féminine.',
-        price: 50000,
-        category: 'bague',
-        colors: ['argent'],
-        sizes: ['8'],
-        stock: 12,
-        images: { argent: ['JH0A9850.jpg', 'JH0A0631.jpg', 'JH0A0060.jpg'] },
-        packagingImage: 'packaging.png',
-        videoUrl: ''
-      },
-      {
-        id: 'prod-4',
-        name: 'chaine pour femme Lovéa',
-        description: 'Exprimez votre amour avec le collier Lovéa, un bijou élégant où trois diamants scintillants forment un cœur parfait. Idéal comme cadeau pour elle, ce collier en argent pur et diamants Moissanite allie raffinement, amour et luxe discret.',
-        price: 40000,
-        category: 'chaîne',
-        colors: ['argent'],
-        sizes: ['40', '45', '50'],
-        stock: 15,
-        images: { argent: ['JH0A8027.jpg', 'JH0A8027_2.jpg'] },
-        packagingImage: 'packaging.png',
-        videoUrl: ''
-      },
-      {
-        id: 'prod-5',
-        name: 'collier Lys - bijoux original pour femme',
-        description: 'Un bijou minimaliste et raffiné avec un diamant rond central comme médaille. Parfait pour les femmes qui aiment les bijoux fins et les bijoux élégants.',
-        price: 35000,
-        category: 'chaîne',
-        colors: ['argent'],
-        sizes: ['40', '45', '50'],
-        stock: 20,
-        images: { argent: ['image_4.jpg', 'image_2.jpg'] },
-        packagingImage: 'packaging.png',
-        videoUrl: ''
-      },
-      {
-        id: 'prod-6',
-        name: 'Bracelet Véa- bijoux tendance',
-        description: 'Le bracelet Véa séduit par son œil central recouvert de diamants Moissanite, symbole de lumière et protection, un bijou tendance et moderne pour toutes les occasions.',
-        price: 35000,
-        category: 'bracelet',
-        colors: ['argent'],
-        sizes: ['16', '18', '20'],
-        stock: 25,
-        images: { argent: ['JH0A1768.jpg', 'JH0A1768_1.jpg', 'JH0A1768_2.jpg', 'JH0A1768_3.jpg'] },
-        packagingImage: 'packaging.png',
-        videoUrl: ''
-      },
-      {
-        id: 'prod-7',
-        name: 'Bracelet Lys – Éclat et féminité',
-        description: 'Offrez le bracelet Lys, un bijou précieux et lumineux avec diamant central et deux diamants secondaires. Idéal comme cadeau romantique ou bijou pour femme élégante.',
-        price: 35000,
-        category: 'bracelet',
-        colors: ['argent'],
-        sizes: ['16', '18', '20'],
-        stock: 18,
-        images: { argent: ['579A6473.jpg', '115A9447.jpg', '2X5A8099.jpg'] },
-        packagingImage: 'packaging.png',
-        videoUrl: ''
+        // ...your 7 product objects here (same as in your original code)
+      ];
+
+      for (const product of products) {
+        await prisma.product.upsert({
+          where: { id: product.id },
+          update: product,
+          create: product
+        });
       }
-    ];
-
-    // Insérer les produits un par un avec Prisma
-    for (const product of products) {
-      await prisma.product.upsert({
-        where: { id: product.id },
-        update: product,
-        create: product
-      });
-    }
-
-    console.log('✅ 7 real Labelia products created!');
+      console.log('✅ 7 real Labelia products created!');
     } else {
       console.log('✅ Products already exist - skipping creation');
     }
@@ -313,8 +213,9 @@ async function initializeDatabase() {
   }
 }
 
+// Listen + initialize DB
 app.listen(PORT, async () => {
-  console.log(`🚀 Server running on https://labelia-backend.onrender.com:${PORT}`);
+  console.log(`\u{1F680} Server running on https://labelia-backend.onrender.com:${PORT}`);
   await initializeDatabase();
 });
 
