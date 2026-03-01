@@ -7,9 +7,9 @@ import { apiClient } from "@/lib/api";
 import { toast } from "sonner";
 
 export default function Cart() {
-  const { items, updateQuantity, removeItem, totalPrice } = useCart();
+  const { items, updateQuantity, removeItem, totalPrice, setDiscount } = useCart();
   const [promoCode, setPromoCode] = useState("");
-  const [discount, setDiscount] = useState(0);
+  const [localDiscount, setLocalDiscount] = useState(0);
 
   const handleApplyPromoCode = async () => {
     if (!promoCode.trim()) {
@@ -29,7 +29,8 @@ export default function Cart() {
           discountAmount = response.promotion.discount;
         }
         
-        setDiscount(discountAmount);
+        setLocalDiscount(discountAmount);
+        setDiscount(discountAmount); // Mettre à jour le CartContext
         toast.success(`Code promo appliqué : -${discountAmount.toLocaleString()} F CFA`);
       } else {
         toast.error(response.message || "Code promo invalide");
@@ -128,17 +129,17 @@ export default function Cart() {
             </button>
           </div>
           
-          {discount > 0 && (
+          {localDiscount > 0 && (
             <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
               <span className="text-sm font-medium text-green-800">Réduction appliquée</span>
-              <span className="text-sm font-semibold text-green-800">-{discount.toLocaleString()} F CFA</span>
+              <span className="text-sm font-semibold text-green-800">-{localDiscount.toLocaleString()} F CFA</span>
             </div>
           )}
         </div>
 
         {/* Total Section */}
         <div className="space-y-2">
-          {discount > 0 && (
+          {localDiscount > 0 && (
             <div className="flex justify-between items-center text-sm">
               <span className="text-muted-foreground">Sous-total</span>
               <span className="font-medium">{totalPrice.toLocaleString()} F CFA</span>
@@ -148,7 +149,7 @@ export default function Cart() {
           <div className="flex justify-between items-center mb-6">
             <span className="font-display text-xl font-medium">Total</span>
             <span className="font-display text-2xl font-semibold">
-              {(totalPrice - discount).toLocaleString()} F CFA
+              {(totalPrice - localDiscount).toLocaleString()} F CFA
             </span>
           </div>
         </div>
