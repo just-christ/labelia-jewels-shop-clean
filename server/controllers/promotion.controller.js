@@ -1,6 +1,13 @@
 import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
+let prisma;
+
+if (typeof global.prisma !== 'undefined') {
+  prisma = global.prisma;
+} else {
+  prisma = new PrismaClient();
+  global.prisma = prisma;
+}
 
 export const getPromotions = async (req, res) => {
   try {
