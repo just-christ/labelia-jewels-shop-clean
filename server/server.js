@@ -20,8 +20,8 @@ app.use(cors({
   origin: function (origin, callback) {
     // En production, autoriser le domaine principal
     const allowedOrigins = [
-      'https://labelia-jewels.com',
-      'https://www.labelia-jewels.com',
+      'https://labelia-jewel.com',
+      'https://www.labelia-jewel.com',
       // Ajoutez d'autres domaines si nécessaire
     ];
     
