@@ -4,14 +4,15 @@ const prisma = new PrismaClient();
 
 export const getPromotions = async (req, res) => {
   try {
+    console.log('🔍 Getting promotions...');
     const promotions = await prisma.promotion.findMany({
       orderBy: { createdAt: 'desc' }
     });
-    
+    console.log('✅ Promotions found:', promotions.length);
     res.json(promotions);
   } catch (error) {
-    console.error('Get promotions error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('❌ Get promotions error:', error);
+    res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 };
 
