@@ -121,7 +121,7 @@ export function generateReceipt(data: ReceiptData): void {
     doc.setTextColor(30, 30, 30);
     doc.text(label, marginX, y);
     doc.text(`${item.quantity}`, 140, y, { align: "center" });
-    doc.text(`${lineTotal.toLocaleString("fr-FR")} FCFA`, W - marginX, y, { align: "right" });
+    doc.text(`${lineTotal.toLocaleString("fr-FR", { useGrouping: false })} FCFA`, W - marginX, y, { align: "right" });
     nl(6);
   });
 
@@ -149,12 +149,12 @@ export function generateReceipt(data: ReceiptData): void {
     nl(6);
   };
 
-  row("Sous-total", `${data.subtotal.toLocaleString("fr-FR")} FCFA`);
+  row("Sous-total", `${data.subtotal.toLocaleString("fr-FR", { useGrouping: false })} FCFA`);
 
   if (data.discount > 0) {
     row(
       `Réduction ${data.discountLabel || ""}`,
-      `-${data.discount.toLocaleString("fr-FR")} FCFA`,
+      `-${data.discount.toLocaleString("fr-FR", { useGrouping: false })} FCFA`,
       false,
       [180, 60, 60]
     );
@@ -170,7 +170,7 @@ export function generateReceipt(data: ReceiptData): void {
   doc.setFont("helvetica", "bold");
   doc.setTextColor(20, 20, 20);
   doc.text("TOTAL PAYÉ :", marginX + 4, y + 4);
-  doc.text(`${data.total.toLocaleString("fr-FR")} FCFA`, W - marginX - 4, y + 4, { align: "right" });
+  doc.text(`${data.total.toLocaleString("fr-FR", { useGrouping: false })} FCFA`, W - marginX - 4, y + 4, { align: "right" });
   y += 16;
   separator();
 
