@@ -1,5 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 
+const prisma = new PrismaClient();
+
 export const getPromotions = async (req, res) => {
   try {
     const promotions = await prisma.promotion.findMany({
