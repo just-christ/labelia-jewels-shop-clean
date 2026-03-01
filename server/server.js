@@ -17,8 +17,34 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'https://labelia-jewel.com',
-  credentials: true
+  origin: function (origin, callback) {
+    // En production, autoriser le domaine principal
+    const allowedOrigins = [
+      'https://labelia-jewels.com',
+      'https://www.labelia-jewels.com',
+      // Ajoutez d'autres domaines si nécessaire
+    ];
+    
+    // En développement, autoriser localhost
+    if (process.env.NODE_ENV !== 'production') {
+      allowedOrigins.push(
+        'http://localhost:3000',
+        'http://localhost:5173',
+        'http://127.0.0.1:3000',
+        'http://127.0.0.1:5173'
+      );
+    }
+    
+    // Autoriser si l'origine est dans la liste ou si c'est une requête interne (pas d'origin)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
