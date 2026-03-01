@@ -35,7 +35,12 @@ export default function AdminPromotions() {
 
   const fetchPromotions = async () => {
     try {
-      const data = await apiClient.getPromotions();
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        toast.error("Token d'authentification manquant");
+        return;
+      }
+      const data = await apiClient.getPromotions(token);
       setPromotions(data);
     } catch (error) {
       toast.error("Erreur lors du chargement des promotions");
