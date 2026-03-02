@@ -61,7 +61,7 @@ export function generateReceipt(data: ReceiptData): void {
   // Bloc logo texte
   text("LABELIA", W / 2, 22, "bold", "center", [20, 20, 20]);
   nl(8);
-  text("Bijoux en Acier Inoxydable", W / 2, 9, "italic", "center", [230, 126, 173]);
+  text("Bijoux en Argent pur", W / 2, 9, "italic", "center", [230, 126, 173]);
   nl(8);
   separator();
 

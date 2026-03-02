@@ -8,7 +8,7 @@ export default function About() {
         <div className="space-y-6 text-muted-foreground leading-relaxed">
           <p className="text-lg">
             Créée par Eva Yeo, Labelia est une marque ivoirienne, basée en Côte d'Ivoire qui 
-            propose des bijoux en acier inoxydable, ainsi que des bijoux haut de gamme en 
+            propose des bijoux en argent pur, ainsi que des bijoux haut de gamme en 
             diamant moissanite et argent pur, alliant élégance, brillance et durabilité.
           </p>
           
@@ -39,7 +39,7 @@ export default function About() {
             <ul className="space-y-3">
               {[
                 "Élégance et brillance dans chaque création",
-                "Qualité des matériaux : acier inoxydable, diamant moissanite, argent pur",
+                "Qualité des matériaux : Argent pur, diamant moissanite, argent pur",
                 "Designs romantiques pour des moments précieux",
                 "Luxe accessible à toutes les femmes",
                 "Expérience unique du choix à la réception",
