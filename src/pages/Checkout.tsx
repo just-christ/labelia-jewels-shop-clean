@@ -20,19 +20,25 @@ export default function Checkout() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!form.name || !form.email || !form.address || !form.phone) {
       toast.error("Veuillez remplir tous les champs.");
       return;
     }
+
     setSubmitting(true);
 
-    const orderItems = items.map((i) => ({
-      name: i.product.name,
-      price: i.product.price,
-      color: i.color,
-      size: i.size,
-      quantity: i.quantity,
-    }));
+    const orderItems = items.map((i) => {
+      const price = (i.product as any).promoPrice ?? i.product.price;
+
+      return {
+        name: i.product.name,
+        price: price,
+        color: i.color,
+        size: i.size,
+        quantity: i.quantity,
+      };
+    });
 
     try {
       const response = await apiClient.createOrder({
@@ -43,15 +49,13 @@ export default function Checkout() {
         items: orderItems,
         subtotal: totalPrice,
         discount: discount,
-        discountCode: discount > 0 ? "CODE_PROMO" : null, // TODO: Récupérer le vrai code promo utilisé
+        discountCode: discount > 0 ? "CODE_PROMO" : null,
         total: totalAfterDiscount,
       });
 
-      // Générer le numéro de commande depuis l'ID retourné par l'API
       const rawId = response?.id || String(Date.now());
       const orderNumber = rawId.replace(/\D/g, "").slice(-6).padStart(6, "0");
 
-      // Générer et télécharger le reçu PDF
       generateReceipt({
         orderNumber,
         date: new Date().toLocaleDateString("fr-FR"),
@@ -59,19 +63,25 @@ export default function Checkout() {
         customerEmail: form.email,
         customerPhone: form.phone,
         customerAddress: form.address,
-        items: items.map((i) => ({
-          product: { name: i.product.name, price: i.product.price },
-          color: i.color,
-          size: i.size,
-          quantity: i.quantity,
-        })),
+        items: items.map((i) => {
+          const price = (i.product as any).promoPrice ?? i.product.price;
+
+          return {
+            product: { name: i.product.name, price: price },
+            color: i.color,
+            size: i.size,
+            quantity: i.quantity,
+          };
+        }),
         subtotal: totalPrice,
         discount: discount,
-        discountLabel: discount > 0 ? `-${discount.toLocaleString("fr-FR")} FCFA` : undefined,
+        discountLabel:
+          discount > 0 ? `-${discount.toLocaleString("fr-FR")} FCFA` : undefined,
         total: totalAfterDiscount,
       });
 
       toast.success("Commande confirmée ! Votre reçu PDF a été téléchargé. 🎉");
+
       clearCart();
       navigate("/");
     } catch (error) {
@@ -81,33 +91,55 @@ export default function Checkout() {
     }
   };
 
-  const update = (field: string, value: string) => setForm((p) => ({ ...p, [field]: value }));
+  const update = (field: string, value: string) =>
+    setForm((p) => ({ ...p, [field]: value }));
 
   return (
     <section className="container mx-auto px-4 py-12 max-w-2xl">
-      <h1 className="font-display text-4xl font-semibold mb-8">Finaliser la commande</h1>
+      <h1 className="font-display text-4xl font-semibold mb-8">
+        Finaliser la commande
+      </h1>
 
       <div className="border rounded-sm p-4 mb-8">
         <h2 className="font-medium text-sm mb-3">Récapitulatif</h2>
-        {items.map((item) => (
-          <div key={`${item.product.id}-${item.color}-${item.size}`} className="flex justify-between text-sm py-1.5">
-            <span>
-              {item.product.name}{" "}
-              <span className="text-muted-foreground capitalize">
-                ({item.color}, {item.size}) × {item.quantity}
+
+        {items.map((item) => {
+          const price = (item.product as any).promoPrice ?? item.product.price;
+
+          return (
+            <div
+              key={`${item.product.id}-${item.color}-${item.size}`}
+              className="flex justify-between text-sm py-1.5"
+            >
+              <span>
+                {item.product.name}{" "}
+                <span className="text-muted-foreground capitalize">
+                  ({item.color}, {item.size}) × {item.quantity}
+                </span>
               </span>
-            </span>
-            <span className="font-medium">{(item.product.price * item.quantity).toLocaleString()} F CFA</span>
-          </div>
-        ))}
+
+              <span className="font-medium">
+                {(price * item.quantity).toLocaleString()} F CFA
+              </span>
+            </div>
+          );
+        })}
+
         <div className="border-t mt-3 pt-3 flex justify-between font-medium">
           <span>Total</span>
-          <span className="text-lg">{totalAfterDiscount.toLocaleString()} F CFA</span>
+          <span className="text-lg">
+            {totalAfterDiscount.toLocaleString()} F CFA
+          </span>
         </div>
+
         {discount > 0 && (
           <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-lg flex justify-between">
-            <span className="text-sm font-medium text-green-800">Réduction appliquée</span>
-            <span className="text-sm font-semibold text-green-800">-{discount.toLocaleString()} F CFA</span>
+            <span className="text-sm font-medium text-green-800">
+              Réduction appliquée
+            </span>
+            <span className="text-sm font-semibold text-green-800">
+              -{discount.toLocaleString()} F CFA
+            </span>
           </div>
         )}
       </div>
@@ -120,7 +152,10 @@ export default function Checkout() {
           { field: "phone", label: "Téléphone", type: "tel", placeholder: "06 12 34 56 78" },
         ].map((f) => (
           <div key={f.field}>
-            <label className="block text-sm font-medium mb-1.5">{f.label}</label>
+            <label className="block text-sm font-medium mb-1.5">
+              {f.label}
+            </label>
+
             <input
               type={f.type}
               placeholder={f.placeholder}
@@ -140,7 +175,9 @@ export default function Checkout() {
           disabled={submitting}
           className="w-full py-4 text-sm font-medium tracking-wider uppercase bg-btn text-btn-foreground hover:bg-btn-hover transition-colors rounded-sm mt-6 disabled:opacity-50"
         >
-          {submitting ? "Traitement..." : `Confirmer la commande — ${totalAfterDiscount.toLocaleString()} F CFA`}
+          {submitting
+            ? "Traitement..."
+            : `Confirmer la commande — ${totalAfterDiscount.toLocaleString()} F CFA`}
         </button>
       </form>
     </section>
