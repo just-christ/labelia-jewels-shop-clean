@@ -142,7 +142,7 @@ export default function Index() {
       </section>
 
       {/* BEST SELLERS */}
-      <section className="container mx-auto px-4 py-20">
+      <section className="container mx-auto px-4 pt-20 pb-12 ">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-semibold mb-4">Nos Best Sellers</h2>
           <p className="text-muted-foreground">
@@ -202,19 +202,18 @@ export default function Index() {
               </div>
             ))
           )}
-          {/* CTA */}
-          <section className="container mx-auto px-4 py-20 text-center">
-            <Link
-              to="/produits"
-              className="inline-block px-8 py-3 bg-black text-white hover:bg-gray-800 transition"
-            >
-              Voir toute la collection →
-            </Link>
-          </section>
         </div>
         
       </section>
-      
+      {/* CTA */}
+      <section className="container mx-auto px-4 py-12 text-center">
+        <Link
+          to="/produits"
+          className="inline-block px-8 py-3 bg-black text-white hover:bg-gray-800 transition"
+        >
+          Voir toute la collection →
+        </Link>
+      </section>
 
       {/* Why Labélia */}
       <section className="bg-secondary/50 py-20">
