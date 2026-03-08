@@ -67,16 +67,11 @@ export default function Products() {
 
   // Function to get the first available image
   const getFirstImage = (images: Record<string, string[]>) => {
-    // Try argent first, then doré
-    if (images.argent && images.argent.length > 0) {
-      return `/Images/${images.argent[0]}`;
-    }
-    if (images.doré && images.doré.length > 0) {
-      return `/Images/${images.doré[0]}`;
-    }
-    // Fallback to placeholder
-    return getPlaceholderImage("Produit", "argent");
-  };
+  const getUrl = (img: string) => img.startsWith('http') ? img : `/Images/${img}`;
+  if (images.argent && images.argent.length > 0) return getUrl(images.argent[0]);
+  if (images.doré && images.doré.length > 0) return getUrl(images.doré[0]);
+  return getPlaceholderImage("Produit", "argent");
+};
 
   return (
     <section className="container mx-auto px-4 py-12">
