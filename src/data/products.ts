@@ -10,7 +10,7 @@ export interface Product {
   category: Category;
   sizes: string[];
   colors: Color[];
-  images: Record<Color, string>;
+  images: Record<Color, string[]>;
   stock: number;
 }
 

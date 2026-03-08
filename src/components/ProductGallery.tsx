@@ -26,12 +26,13 @@ export default function ProductGallery({
     const packagingIndex = currentImages.length + videoOffset;
     
     if (packagingImage && currentImageIndex === packagingIndex) {
-      return `/Images/${packagingImage}`;
+      return packagingImage.startsWith('http') ? packagingImage : `/Images/${packagingImage}`;
     }
     
     const productImageIndex = videoUrl ? currentImageIndex - 1 : currentImageIndex;
     if (productImageIndex >= 0 && productImageIndex < currentImages.length) {
-      return `/Images/${currentImages[productImageIndex]}`;
+      const image = currentImages[productImageIndex];
+      return image.startsWith('http') ? image : `/Images/${image}`;
     }
     
     return null;
@@ -153,7 +154,7 @@ export default function ProductGallery({
             }`}
           >
             <img
-              src={`/Images/${image}`}
+              src={image.startsWith('http') ? image : `/Images/${image}`}
               alt={`${productName} - ${selectedColor} ${index + 1}`}
               className="w-full h-full object-cover hover:scale-105 transition-transform"
               onError={(e) => {
@@ -171,7 +172,7 @@ export default function ProductGallery({
             }`}
           >
             <img
-              src={`/Images/${packagingImage}`}
+              src={packagingImage.startsWith('http') ? packagingImage : `/Images/${packagingImage}`}
               alt="Packaging du produit"
               className="w-full h-full object-cover hover:scale-105 transition-transform"
               onError={(e) => {

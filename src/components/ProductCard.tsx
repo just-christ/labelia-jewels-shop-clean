@@ -16,7 +16,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         if (Array.isArray(colorImages) && colorImages.length > 0) {
           const firstImage = colorImages[0];
           console.log(`ProductCard: Found image ${firstImage} for color ${color}`);
-          return `/Images/${firstImage}`;
+          return firstImage.startsWith('http') ? firstImage : `/Images/${firstImage}`;
         }
       }
     }
