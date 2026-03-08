@@ -46,8 +46,8 @@ app.use(express.json());
 app.use('/Images', express.static(path.join(process.cwd(), 'uploads')));
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
-// Servir les fichiers statiques du frontend en production
-if (process.env.NODE_ENV === 'production') {
+// Servir les fichiers statiques du frontend en développement uniquement
+if (process.env.NODE_ENV === 'development') {
   app.use(express.static(path.join(process.cwd(), 'dist')));
   
   // Toutes les routes non-API redirigées vers index.html
