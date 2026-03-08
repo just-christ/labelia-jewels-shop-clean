@@ -11,6 +11,7 @@ interface Product {
   name: string;
   description: string;
   price: number;
+  promoPrice?: number | null;
   category: string;
   sizes: string[];
   colors: string[];
@@ -30,47 +31,30 @@ function getImageUrl(img: string): string {
 
 // ─── Images disponibles - Collection DIAMOND UNIVERS ─────────────────────────
 const AVAILABLE_IMAGES: string[] = [
-  // Packaging universel
   "packaging.png",
-  
-  // Bague Lumina
   "JH0A9575.jpg",
   "JH0A9678.jpg",
   "JH0A9690.jpg",
   "JH0A9831.jpg",
-  
-  // Bague AÏNA
   "JH0A3163_3.jpg",
   "JH0A3163_4.jpg",
   "JH0A3163_2.jpg",
   "JH0A3163.jpg",
-  
-  // Bague Héra
   "JH0A9850.jpg",
   "JH0A0631.jpg",
   "JH0A0060.jpg",
   "JH0A0055.jpg",
-  
-  // Collier Lovéa
   "JH0A8027.jpg",
   "JH0A8027_2.jpg",
-  
-  // Collier Lys
   "image_4.jpg",
   "image_2.jpg",
-  
-  // Bracelet Véa
   "JH0A1768.jpg",
   "JH0A1768_1.jpg",
   "JH0A1768_2.jpg",
   "JH0A1768_3.jpg",
-  
-  // Bracelet Lys
   "579A6473.jpg",
   "115A9447.jpg",
   "2X5A8099.jpg",
-  
-  // Images système
   "IMG_2084.jpg",
   "IMG_2113.jpg",
   "IMG_2123.jpg",
@@ -81,10 +65,10 @@ const emptyProduct = {
   name: "",
   description: "",
   price: 0,
+  promoPrice: null as number | null,
   category: "bague",
   sizes: [] as string[],
-  colors: ["argent", "doré"],
-  stock: 0,
+  colors: ["argent"] as string[],
   images: { argent: [], doré: [] } as Record<string, string[]>,
   packagingImage: "",
   videoUrl: "",
@@ -157,9 +141,7 @@ function ImagePicker({
                   type="button"
                   onClick={() => toggle(img)}
                   className={`relative rounded-md overflow-hidden border-2 transition-all ${
-                    isSelected
-                      ? "border-btn scale-95"
-                      : "border-transparent hover:border-muted-foreground/40"
+                    isSelected ? "border-btn scale-95" : "border-transparent hover:border-muted-foreground/40"
                   }`}
                 >
                   <img
@@ -225,11 +207,7 @@ function SingleImagePicker({
             alt={selected}
             className="w-14 h-14 object-cover rounded-md border-2 border-btn"
           />
-          <button
-            type="button"
-            onClick={() => onChange("")}
-            className="text-xs text-destructive hover:underline"
-          >
+          <button type="button" onClick={() => onChange("")} className="text-xs text-destructive hover:underline">
             Retirer
           </button>
         </div>
@@ -242,14 +220,9 @@ function SingleImagePicker({
               <button
                 key={img}
                 type="button"
-                onClick={() => {
-                  onChange(img);
-                  setOpen(false);
-                }}
+                onClick={() => { onChange(img); setOpen(false); }}
                 className={`relative rounded-md overflow-hidden border-2 transition-all ${
-                  selected === img
-                    ? "border-btn scale-95"
-                    : "border-transparent hover:border-muted-foreground/40"
+                  selected === img ? "border-btn scale-95" : "border-transparent hover:border-muted-foreground/40"
                 }`}
               >
                 <img
@@ -285,9 +258,7 @@ export default function AdminProducts() {
   const [sizesInput, setSizesInput] = useState("");
   const { user } = useAuth();
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
+  useEffect(() => { fetchProducts(); }, []);
 
   const fetchProducts = async () => {
     try {
@@ -326,10 +297,10 @@ export default function AdminProducts() {
       name: p.name,
       description: p.description,
       price: p.price,
+      promoPrice: p.promoPrice || null,
       category: p.category,
       sizes: p.sizes,
       colors: p.colors,
-      stock: p.stock,
       images: p.images || { argent: [], doré: [] },
       packagingImage: p.packagingImage || "",
       videoUrl: p.videoUrl || "",
@@ -342,7 +313,10 @@ export default function AdminProducts() {
     if (!user) return;
     const token = localStorage.getItem("authToken");
     if (!token) return;
-    const sizes = sizesInput.split(",").map((s) => s.trim()).filter(Boolean);
+    // Tailles uniquement pour les bagues
+    const sizes = form.category === "bague"
+      ? sizesInput.split(",").map((s) => s.trim()).filter(Boolean)
+      : [];
     const payload = { ...form, sizes };
     try {
       if (editing) {
@@ -359,13 +333,10 @@ export default function AdminProducts() {
     }
   };
 
-  // ✅ Corrigé : gère les URLs Cloudinary (http) ET les anciens noms de fichiers locaux
   const getFirstImage = (p: Product): string | null => {
     for (const color of Object.keys(p.images || {})) {
       const imgs = p.images[color];
-      if (imgs && imgs.length > 0) {
-        return getImageUrl(imgs[0]);
-      }
+      if (imgs && imgs.length > 0) return getImageUrl(imgs[0]);
     }
     return null;
   };
@@ -392,34 +363,32 @@ export default function AdminProducts() {
         </div>
       ) : (
         <>
-          {/* Cartes sur mobile */}
+          {/* Cartes mobile */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:hidden gap-3">
             {products.map((p) => {
               const img = getFirstImage(p);
               return (
                 <div key={p.id} className="border rounded-xl p-3 bg-card flex gap-3">
                   <div className="w-16 h-16 rounded-lg overflow-hidden bg-secondary shrink-0">
-                    {img ? (
-                      <img src={img} alt={p.name} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <ImageIcon size={20} className="text-muted-foreground/40" />
-                      </div>
-                    )}
+                    {img ? <img src={img} alt={p.name} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><ImageIcon size={20} className="text-muted-foreground/40" /></div>}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-sm truncate">{p.name}</p>
                     <p className="text-xs text-muted-foreground capitalize">{p.category}</p>
-                    <p className="text-sm font-semibold mt-0.5">{p.price.toLocaleString()} F CFA</p>
-                    <p className="text-xs text-muted-foreground">Stock : {p.stock}</p>
+                    <div className="mt-0.5">
+                      {p.promoPrice ? (
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-xs text-muted-foreground line-through">{p.price.toLocaleString()} F</span>
+                          <span className="text-sm font-semibold text-red-600">{p.promoPrice.toLocaleString()} F</span>
+                        </div>
+                      ) : (
+                        <p className="text-sm font-semibold">{p.price.toLocaleString()} F CFA</p>
+                      )}
+                    </div>
                   </div>
                   <div className="flex flex-col gap-1 shrink-0">
-                    <button onClick={() => openEdit(p)} className="p-2 hover:text-primary transition-colors rounded-lg hover:bg-secondary">
-                      <Pencil size={15} />
-                    </button>
-                    <button onClick={() => handleDelete(p.id)} className="p-2 hover:text-destructive transition-colors rounded-lg hover:bg-secondary">
-                      <Trash2 size={15} />
-                    </button>
+                    <button onClick={() => openEdit(p)} className="p-2 hover:text-primary transition-colors rounded-lg hover:bg-secondary"><Pencil size={15} /></button>
+                    <button onClick={() => handleDelete(p.id)} className="p-2 hover:text-destructive transition-colors rounded-lg hover:bg-secondary"><Trash2 size={15} /></button>
                   </div>
                 </div>
               );
@@ -435,7 +404,6 @@ export default function AdminProducts() {
                   <th className="px-4 py-3 text-sm font-medium">Nom</th>
                   <th className="px-4 py-3 text-sm font-medium">Catégorie</th>
                   <th className="px-4 py-3 text-sm font-medium">Prix</th>
-                  <th className="px-4 py-3 text-sm font-medium">Stock</th>
                   <th className="px-4 py-3 text-sm font-medium w-24">Actions</th>
                 </tr>
               </thead>
@@ -446,27 +414,25 @@ export default function AdminProducts() {
                     <tr key={p.id} className="border-t hover:bg-secondary/30 transition-colors">
                       <td className="px-4 py-3">
                         <div className="w-12 h-12 rounded-lg overflow-hidden bg-secondary">
-                          {img ? (
-                            <img src={img} alt={p.name} className="w-full h-full object-cover" />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <ImageIcon size={16} className="text-muted-foreground/40" />
-                            </div>
-                          )}
+                          {img ? <img src={img} alt={p.name} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><ImageIcon size={16} className="text-muted-foreground/40" /></div>}
                         </div>
                       </td>
                       <td className="px-4 py-3 font-medium text-sm">{p.name}</td>
                       <td className="px-4 py-3 text-sm capitalize">{p.category}</td>
-                      <td className="px-4 py-3 text-sm">{p.price.toLocaleString()} F CFA</td>
-                      <td className="px-4 py-3 text-sm">{p.stock}</td>
+                      <td className="px-4 py-3 text-sm">
+                        {p.promoPrice ? (
+                          <div>
+                            <span className="text-muted-foreground line-through text-xs">{p.price.toLocaleString()} F</span>
+                            <span className="ml-1.5 text-red-600 font-semibold">{p.promoPrice.toLocaleString()} F</span>
+                          </div>
+                        ) : (
+                          <span>{p.price.toLocaleString()} F CFA</span>
+                        )}
+                      </td>
                       <td className="px-4 py-3">
                         <div className="flex gap-1">
-                          <button onClick={() => openEdit(p)} className="p-1.5 hover:text-primary rounded hover:bg-secondary transition-colors">
-                            <Pencil size={15} />
-                          </button>
-                          <button onClick={() => handleDelete(p.id)} className="p-1.5 hover:text-destructive rounded hover:bg-secondary transition-colors">
-                            <Trash2 size={15} />
-                          </button>
+                          <button onClick={() => openEdit(p)} className="p-1.5 hover:text-primary rounded hover:bg-secondary transition-colors"><Pencil size={15} /></button>
+                          <button onClick={() => handleDelete(p.id)} className="p-1.5 hover:text-destructive rounded hover:bg-secondary transition-colors"><Trash2 size={15} /></button>
                         </div>
                       </td>
                     </tr>
@@ -488,6 +454,8 @@ export default function AdminProducts() {
           </DialogHeader>
 
           <div className="space-y-4 mt-2">
+
+            {/* Nom */}
             <div>
               <label className="block text-sm font-medium mb-1">Nom du produit</label>
               <input
@@ -498,6 +466,7 @@ export default function AdminProducts() {
               />
             </div>
 
+            {/* Description */}
             <div>
               <label className="block text-sm font-medium mb-1">Description</label>
               <textarea
@@ -508,6 +477,7 @@ export default function AdminProducts() {
               />
             </div>
 
+            {/* Prix + Prix promo */}
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-sm font-medium mb-1">Prix (F CFA)</label>
@@ -519,21 +489,25 @@ export default function AdminProducts() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Stock</label>
+                <label className="block text-sm font-medium mb-1">
+                  Prix promo <span className="text-muted-foreground font-normal text-xs">(optionnel)</span>
+                </label>
                 <input
                   type="number"
-                  value={form.stock}
-                  onChange={(e) => setForm({ ...form, stock: Number(e.target.value) })}
+                  value={form.promoPrice || ""}
+                  onChange={(e) => setForm({ ...form, promoPrice: e.target.value ? Number(e.target.value) : null })}
+                  placeholder="Laisser vide si aucune promo"
                   className="w-full border rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground"
                 />
               </div>
             </div>
 
+            {/* Catégorie */}
             <div>
               <label className="block text-sm font-medium mb-1">Catégorie</label>
               <select
                 value={form.category}
-                onChange={(e) => setForm({ ...form, category: e.target.value })}
+                onChange={(e) => setForm({ ...form, category: e.target.value, sizes: [] })}
                 className="w-full border rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground"
               >
                 <option value="bague">Bagues</option>
@@ -542,16 +516,20 @@ export default function AdminProducts() {
               </select>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-1">Tailles (séparées par des virgules)</label>
-              <input
-                value={sizesInput}
-                onChange={(e) => setSizesInput(e.target.value)}
-                placeholder="ex: 50, 52, 54, 56"
-                className="w-full border rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground"
-              />
-            </div>
+            {/* Tailles — uniquement pour les bagues */}
+            {form.category === "bague" && (
+              <div>
+                <label className="block text-sm font-medium mb-1">Tailles (séparées par des virgules)</label>
+                <input
+                  value={sizesInput}
+                  onChange={(e) => setSizesInput(e.target.value)}
+                  placeholder="ex: 50, 52, 54, 56"
+                  className="w-full border rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground"
+                />
+              </div>
+            )}
 
+            {/* Couleurs */}
             <div>
               <label className="block text-sm font-medium mb-2">Couleurs disponibles</label>
               <div className="flex gap-4">
@@ -573,45 +551,41 @@ export default function AdminProducts() {
               </div>
             </div>
 
-            {/* Sélecteur images locales */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium">Images du produit (collection existante)</label>
-              <p className="text-xs text-muted-foreground">Clique sur une image pour la sélectionner / désélectionner</p>
-              {["argent", "doré"].map((color) => (
-                <ImagePicker
-                  key={color}
-                  label={`Images — ${color}`}
-                  selected={form.images[color] || []}
-                  onChange={(imgs) =>
-                    setForm({ ...form, images: { ...form.images, [color]: imgs } })
-                  }
-                />
-              ))}
-            </div>
+            {/* Images — apparaît uniquement si la couleur est cochée */}
+            {form.colors.length > 0 && (
+              <div className="space-y-4">
+                <label className="block text-sm font-medium">Images du produit</label>
+                {form.colors.map((color) => (
+                  <div key={color} className="space-y-2 border rounded-lg p-3 bg-secondary/10">
+                    <p className="text-sm font-medium capitalize">
+                      Couleur — <span className="text-primary">{color}</span>
+                    </p>
 
-            {/* Upload Cloudinary */}
-            <div className="space-y-2">
-              <label className="block text-sm font-medium">Uploader vos propres images</label>
-              <p className="text-xs text-muted-foreground">Les images uploadées seront ajoutées aux images déjà sélectionnées</p>
-              {["argent", "doré"].map((color) => (
-                <div key={color} className="space-y-2">
-                  <h4 className="text-sm font-medium capitalize">Images {color}</h4>
-                  <ImageUpload
-                    initialImages={[]}
-                    onImagesChange={(imgs) => {
-                      // ✅ Fusion : garde les images locales + ajoute les nouvelles Cloudinary
-                      const existing = form.images[color] || [];
-                      const localImgs = existing.filter((i) => !i.startsWith("http"));
-                      const cloudinaryImgs = imgs.filter((i) => i.startsWith("http"));
-                      const merged = [...localImgs, ...cloudinaryImgs];
-                      setForm({ ...form, images: { ...form.images, [color]: merged } });
-                    }}
-                    maxImages={5}
-                    label={`Images ${color}`}
-                  />
-                </div>
-              ))}
-            </div>
+                    {/* Sélection depuis collection existante */}
+                    <ImagePicker
+                      label={`Images existantes — ${color}`}
+                      selected={(form.images[color] || []).filter(i => !i.startsWith("http"))}
+                      onChange={(imgs) => {
+                        const cloudinary = (form.images[color] || []).filter(i => i.startsWith("http"));
+                        setForm({ ...form, images: { ...form.images, [color]: [...imgs, ...cloudinary] } });
+                      }}
+                    />
+
+                    {/* Upload Cloudinary */}
+                    <ImageUpload
+                      initialImages={[]}
+                      onImagesChange={(imgs) => {
+                        const local = (form.images[color] || []).filter(i => !i.startsWith("http"));
+                        const cloudinary = imgs.filter(i => i.startsWith("http"));
+                        setForm({ ...form, images: { ...form.images, [color]: [...local, ...cloudinary] } });
+                      }}
+                      maxImages={5}
+                      label={`Uploader images — ${color}`}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
 
             {/* Packaging */}
             <div>
@@ -625,7 +599,9 @@ export default function AdminProducts() {
 
             {/* Vidéo */}
             <div>
-              <label className="block text-sm font-medium mb-1">URL vidéo (optionnel)</label>
+              <label className="block text-sm font-medium mb-1">
+                URL vidéo <span className="text-muted-foreground font-normal text-xs">(optionnel)</span>
+              </label>
               <input
                 type="url"
                 value={form.videoUrl || ""}

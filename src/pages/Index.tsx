@@ -77,7 +77,8 @@ export default function Index() {
       for (const color of Object.keys(product.images)) {
         const colorImages = product.images[color];
         if (Array.isArray(colorImages) && colorImages.length > 0) {
-          return `/Images/${colorImages[0]}`;
+          const img = colorImages[0];
+          return img.startsWith('http') ? img : `/Images/${img}`;
         }
       }
     }
