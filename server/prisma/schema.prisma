@@ -44,7 +44,10 @@ model Order {
   customerPhone   String   @map("customer_phone")
   customerAddress String   @map("customer_address")
   items           Json
-  total           Float
+  subtotal        Float    // Total avant réduction
+  discount        Float    @default(0) // Montant de réduction
+  discountCode    String?  // Code promo utilisé
+  total           Float    // Total final après réduction
   status          String   @default("pending")
   stripePaymentId String?  @map("stripe_payment_id")
   createdAt       DateTime @default(now())

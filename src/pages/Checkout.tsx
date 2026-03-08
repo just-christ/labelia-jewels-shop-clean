@@ -41,6 +41,9 @@ export default function Checkout() {
         customerAddress: form.address,
         customerPhone: form.phone,
         items: orderItems,
+        subtotal: totalPrice,
+        discount: discount,
+        discountCode: discount > 0 ? "CODE_PROMO" : null, // TODO: Récupérer le vrai code promo utilisé
         total: totalAfterDiscount,
       });
 

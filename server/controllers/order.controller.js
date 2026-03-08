@@ -8,6 +8,9 @@ export const createOrder = async (req, res) => {
       customerPhone, 
       customerAddress, 
       items, 
+      subtotal,
+      discount,
+      discountCode,
       total 
     } = req.body;
 
@@ -15,7 +18,7 @@ export const createOrder = async (req, res) => {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // Create order in database with Cash on Delivery
+    // Create order in database with promotion tracking
     const order = await prisma.order.create({
       data: {
         customerName,
@@ -23,6 +26,9 @@ export const createOrder = async (req, res) => {
         customerPhone,
         customerAddress,
         items,
+        subtotal: parseFloat(subtotal) || parseFloat(total), // Fallback to total if subtotal not provided
+        discount: parseFloat(discount) || 0,
+        discountCode: discountCode || null,
         total: parseFloat(total),
         status: 'en_attente' // Cash on Delivery - payment pending
       }

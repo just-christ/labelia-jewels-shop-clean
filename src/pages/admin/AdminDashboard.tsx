@@ -52,11 +52,15 @@ export default function AdminDashboard() {
       }
 
       const orders = await apiClient.getOrders(token);
+      const paidOrders = orders.filter((order: any) => 
+        order.status === 'payée' || order.status === 'paid'
+      );
+      
       setStats({
         totalProducts: products.length,
         totalOrders: orders.length,
         totalUsers: 1,
-        totalRevenue: orders.reduce((sum: number, order: any) => sum + (order.totalAmount || 0), 0),
+        totalRevenue: paidOrders.reduce((sum: number, order: any) => sum + (order.totalAmount || order.total || 0), 0),
         recentOrders: orders.slice(0, 5),
       });
     } catch (error: any) {
@@ -77,6 +81,24 @@ export default function AdminDashboard() {
 
   const fetchAdminUsers = async () => {
     setAdminUsers([{ id: "1", email: "admin@labelia.fr", role: "admin", createdAt: new Date().toISOString() }]);
+  };
+
+  const statusLabels: Record<string, string> = {
+    en_attente: "En attente",
+    payée: "Payée",
+    expédiée: "Expédiée",
+    pending: "En attente",
+    paid: "Payée", 
+    shipped: "Expédiée",
+  };
+
+  const statusColors: Record<string, string> = {
+    en_attente: "bg-yellow-100 text-yellow-800",
+    payée: "bg-green-100 text-green-800",
+    expédiée: "bg-blue-100 text-blue-800",
+    pending: "bg-yellow-100 text-yellow-800",
+    paid: "bg-green-100 text-green-800",
+    shipped: "bg-blue-100 text-blue-800",
   };
 
   const handleAddAdmin = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -165,7 +187,9 @@ export default function AdminDashboard() {
                 </div>
                 <div className="text-right ml-3 shrink-0">
                   <p className="text-sm font-semibold">{order.totalAmount?.toLocaleString()} F</p>
-                  <p className="text-xs text-muted-foreground">{order.status}</p>
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${statusColors[order.status] || 'bg-gray-100 text-gray-800'}`}>
+                    {statusLabels[order.status] || order.status}
+                  </span>
                 </div>
               </div>
             ))}
