@@ -54,7 +54,7 @@ export default function ImageUpload({
         }
 
         const result = await response.json();
-        return `/uploads/${result.filename}`;
+        return result.url;;
       });
 
       const uploadedImages = await Promise.all(uploadPromises);

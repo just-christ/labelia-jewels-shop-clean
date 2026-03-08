@@ -22,53 +22,59 @@ interface Product {
   updatedAt: string;
 }
 
+// ─── Helper URL ────────────────────────────────────────────────────────────
+function getImageUrl(img: string): string {
+  if (!img) return "";
+  return img.startsWith("http") ? img : `/Images/${img}`;
+}
+
 // ─── Images disponibles - Collection DIAMOND UNIVERS ─────────────────────────
 const AVAILABLE_IMAGES: string[] = [
   // Packaging universel
   "packaging.png",
   
   // Bague Lumina
-  "JH0A9575.jpg",  // Image de couverture
-  "JH0A9678.jpg",  // Image produit
-  "JH0A9690.jpg",  // Image produit
-  "JH0A9831.jpg",  // Packaging
+  "JH0A9575.jpg",
+  "JH0A9678.jpg",
+  "JH0A9690.jpg",
+  "JH0A9831.jpg",
   
   // Bague AÏNA
-  "JH0A3163_3.jpg", // Image de couverture
-  "JH0A3163_4.jpg", // Image produit
-  "JH0A3163_2.jpg", // Image produit
-  "JH0A3163.jpg",  // Packaging
+  "JH0A3163_3.jpg",
+  "JH0A3163_4.jpg",
+  "JH0A3163_2.jpg",
+  "JH0A3163.jpg",
   
   // Bague Héra
-  "JH0A9850.jpg",  // Image de couverture
-  "JH0A0631.jpg",  // Image produit
-  "JH0A0060.jpg",  // Image produit
-  "JH0A0055.jpg",  // Packaging
+  "JH0A9850.jpg",
+  "JH0A0631.jpg",
+  "JH0A0060.jpg",
+  "JH0A0055.jpg",
   
   // Collier Lovéa
-  "JH0A8027.jpg",  // Image produit
-  "JH0A8027_2.jpg", // Image produit
+  "JH0A8027.jpg",
+  "JH0A8027_2.jpg",
   
   // Collier Lys
-  "image_4.jpg",   // Image produit
-  "image_2.jpg",   // Image produit
+  "image_4.jpg",
+  "image_2.jpg",
   
   // Bracelet Véa
-  "JH0A1768.jpg",  // Image de couverture
-  "JH0A1768_1.jpg", // Image produit
-  "JH0A1768_2.jpg", // Image produit
-  "JH0A1768_3.jpg", // Image produit
+  "JH0A1768.jpg",
+  "JH0A1768_1.jpg",
+  "JH0A1768_2.jpg",
+  "JH0A1768_3.jpg",
   
   // Bracelet Lys
-  "579A6473.jpg",  // Image de couverture
-  "115A9447.jpg",  // Image produit
-  "2X5A8099.jpg",  // Image produit
+  "579A6473.jpg",
+  "115A9447.jpg",
+  "2X5A8099.jpg",
   
   // Images système
-  "IMG_2084.jpg",  // Carrousel slide 1
-  "IMG_2113.jpg",  // Carrousel slide 2
-  "IMG_2123.jpg",  // Carrousel slide 3
-  "Guide taille bague.jpg", // Guide des tailles
+  "IMG_2084.jpg",
+  "IMG_2113.jpg",
+  "IMG_2123.jpg",
+  "Guide taille bague.jpg",
 ];
 
 const emptyProduct = {
@@ -124,7 +130,7 @@ function ImagePicker({
           {selected.map((img) => (
             <div key={img} className="relative group">
               <img
-                src={`/Images/${img}`}
+                src={getImageUrl(img)}
                 alt={img}
                 className="w-14 h-14 object-cover rounded-md border-2 border-btn"
               />
@@ -157,7 +163,7 @@ function ImagePicker({
                   }`}
                 >
                   <img
-                    src={`/Images/${img}`}
+                    src={getImageUrl(img)}
                     alt={img}
                     className="w-full aspect-square object-cover"
                     onError={(e) => {
@@ -215,7 +221,7 @@ function SingleImagePicker({
       {selected && (
         <div className="flex items-center gap-3 p-2 border-t bg-secondary/10">
           <img
-            src={`/Images/${selected}`}
+            src={getImageUrl(selected)}
             alt={selected}
             className="w-14 h-14 object-cover rounded-md border-2 border-btn"
           />
@@ -247,7 +253,7 @@ function SingleImagePicker({
                 }`}
               >
                 <img
-                  src={`/Images/${img}`}
+                  src={getImageUrl(img)}
                   alt={img}
                   className="w-full aspect-square object-cover"
                   onError={(e) => {
@@ -353,10 +359,13 @@ export default function AdminProducts() {
     }
   };
 
+  // ✅ Corrigé : gère les URLs Cloudinary (http) ET les anciens noms de fichiers locaux
   const getFirstImage = (p: Product): string | null => {
     for (const color of Object.keys(p.images || {})) {
       const imgs = p.images[color];
-      if (imgs && imgs.length > 0) return `/Images/${imgs[0]}`;
+      if (imgs && imgs.length > 0) {
+        return getImageUrl(imgs[0]);
+      }
     }
     return null;
   };
@@ -564,9 +573,9 @@ export default function AdminProducts() {
               </div>
             </div>
 
-            {/* Sélecteur images visuels */}
+            {/* Sélecteur images locales */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium">Images du produit</label>
+              <label className="block text-sm font-medium">Images du produit (collection existante)</label>
               <p className="text-xs text-muted-foreground">Clique sur une image pour la sélectionner / désélectionner</p>
               {["argent", "doré"].map((color) => (
                 <ImagePicker
@@ -580,18 +589,23 @@ export default function AdminProducts() {
               ))}
             </div>
 
-            {/* Upload d'images personnalisées */}
+            {/* Upload Cloudinary */}
             <div className="space-y-2">
               <label className="block text-sm font-medium">Uploader vos propres images</label>
-              <p className="text-xs text-muted-foreground">Ajoutez vos propres images si celles disponibles ne vous conviennent pas</p>
+              <p className="text-xs text-muted-foreground">Les images uploadées seront ajoutées aux images déjà sélectionnées</p>
               {["argent", "doré"].map((color) => (
                 <div key={color} className="space-y-2">
                   <h4 className="text-sm font-medium capitalize">Images {color}</h4>
                   <ImageUpload
-                    initialImages={form.images[color] || []}
-                    onImagesChange={(imgs) =>
-                      setForm({ ...form, images: { ...form.images, [color]: imgs } })
-                    }
+                    initialImages={[]}
+                    onImagesChange={(imgs) => {
+                      // ✅ Fusion : garde les images locales + ajoute les nouvelles Cloudinary
+                      const existing = form.images[color] || [];
+                      const localImgs = existing.filter((i) => !i.startsWith("http"));
+                      const cloudinaryImgs = imgs.filter((i) => i.startsWith("http"));
+                      const merged = [...localImgs, ...cloudinaryImgs];
+                      setForm({ ...form, images: { ...form.images, [color]: merged } });
+                    }}
                     maxImages={5}
                     label={`Images ${color}`}
                   />
