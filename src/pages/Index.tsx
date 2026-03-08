@@ -202,17 +202,19 @@ export default function Index() {
               </div>
             ))
           )}
+          {/* CTA */}
+          <section className="container mx-auto px-4 py-20 text-center">
+            <Link
+              to="/produits"
+              className="inline-block px-8 py-3 bg-black text-white hover:bg-gray-800 transition"
+            >
+              Voir toute la collection →
+            </Link>
+          </section>
         </div>
+        
       </section>
-      {/* CTA */}
-      <section className="container mx-auto px-4 py-20 text-center">
-        <Link
-          to="/produits"
-          className="inline-block px-8 py-3 bg-black text-white hover:bg-gray-800 transition"
-        >
-          Voir toute la collection →
-        </Link>
-      </section>
+      
 
       {/* Why Labélia */}
       <section className="bg-secondary/50 py-20">
