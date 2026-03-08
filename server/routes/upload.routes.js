@@ -23,12 +23,8 @@ router.post('/single', authenticateToken, requireAdmin, uploadSingle, (req, res)
 
     console.log('✅ File received:', req.file.filename, 'Size:', req.file.size, 'Type:', req.file.mimetype);
 
-    // URL dynamique selon l'environnement
-    const baseUrl = process.env.NODE_ENV === 'production' 
-      ? 'https://labelia-backend.onrender.com'
-      : 'http://localhost:5000';
-    
-    const imageUrl = `${baseUrl}/uploads/${req.file.filename}`;
+    // Cloudinary retourne l'URL complète dans req.file.path
+    const imageUrl = req.file.path;
     
     console.log('✅ Upload success:', imageUrl);
     

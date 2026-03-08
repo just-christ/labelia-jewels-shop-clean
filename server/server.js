@@ -43,8 +43,9 @@ app.use(cors({
 }));
 
 app.use(express.json());
-app.use('/Images', express.static(path.join(process.cwd(), 'uploads')));
-app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+
+// Servir les images Cloudinary (pas de dossier local nécessaire)
+// Les URLs Cloudinary sont complètes et publiques
 
 // Servir les fichiers statiques du frontend en développement uniquement
 if (process.env.NODE_ENV === 'development') {
