@@ -6,7 +6,6 @@ import { Tag } from "lucide-react";
 import { apiClient } from "@/lib/api";
 import { toast } from "sonner";
 
-// ✅ Helper pour gérer les URLs Cloudinary ET les images locales
 function getImageUrl(img: string): string {
   if (!img) return "";
   return img.startsWith("http") ? img : `/Images/${img}`;
@@ -22,10 +21,8 @@ export default function Cart() {
       toast.error("Veuillez entrer un code promo");
       return;
     }
-    
     try {
       const response = await apiClient.validatePromoCode(promoCode);
-      
       if (response.valid) {
         let discountAmount = 0;
         if (response.promotion.isPercentage) {
@@ -33,7 +30,6 @@ export default function Cart() {
         } else {
           discountAmount = response.promotion.discount;
         }
-        
         setLocalDiscount(discountAmount);
         setDiscount(discountAmount);
         toast.success(`Code promo appliqué : -${discountAmount.toLocaleString()} F CFA`);
@@ -71,44 +67,37 @@ export default function Cart() {
             ? getImageUrl(firstImg)
             : `data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Crect fill='%23C0C0C0' width='200' height='200' rx='12'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-family='Arial' font-size='14' font-weight='bold'%3E${encodeURIComponent(item.product.name.substring(0, 10))}%3C/text%3E%3C/svg%3E`;
 
+          const unitPrice = (item.product as any).promoPrice || item.product.price;
+
           return (
             <div
               key={`${item.product.id}-${item.color}-${item.size}`}
               className="flex gap-4 p-4 border rounded-sm"
             >
               <div className="w-20 h-20 bg-secondary rounded-sm overflow-hidden flex-shrink-0">
-                <img
-                  src={imgSrc}
-                  alt={item.product.name}
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                />
+                <img src={imgSrc} alt={item.product.name} className="w-full h-full object-cover" loading="lazy" />
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="font-display text-lg font-medium">{item.product.name}</h3>
-                <p className="text-xs text-muted-foreground capitalize">
-                  {item.color} · {item.size}
-                </p>
-                <p className="text-sm font-medium mt-1">{item.product.price.toLocaleString()} F CFA</p>
+                <p className="text-xs text-muted-foreground capitalize">{item.color} · {item.size}</p>
+                {(item.product as any).promoPrice ? (
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-xs text-muted-foreground line-through">{item.product.price.toLocaleString()} F CFA</span>
+                    <span className="text-sm font-semibold text-red-600">{(item.product as any).promoPrice.toLocaleString()} F CFA</span>
+                  </div>
+                ) : (
+                  <p className="text-sm font-medium mt-1">{item.product.price.toLocaleString()} F CFA</p>
+                )}
               </div>
               <div className="flex items-center gap-2">
-                <button
-                  onClick={() => updateQuantity(item.product.id, item.color, item.size, item.quantity - 1)}
-                  className="w-8 h-8 flex items-center justify-center border rounded-sm hover:bg-secondary transition-colors"
-                >
+                <button onClick={() => updateQuantity(item.product.id, item.color, item.size, item.quantity - 1)} className="w-8 h-8 flex items-center justify-center border rounded-sm hover:bg-secondary transition-colors">
                   <Minus size={14} />
                 </button>
                 <span className="w-8 text-center text-sm font-medium">{item.quantity}</span>
-                <button
-                  onClick={() => updateQuantity(item.product.id, item.color, item.size, item.quantity + 1)}
-                  className="w-8 h-8 flex items-center justify-center border rounded-sm hover:bg-secondary transition-colors"
-                >
+                <button onClick={() => updateQuantity(item.product.id, item.color, item.size, item.quantity + 1)} className="w-8 h-8 flex items-center justify-center border rounded-sm hover:bg-secondary transition-colors">
                   <Plus size={14} />
                 </button>
-                <button
-                  onClick={() => removeItem(item.product.id, item.color, item.size)}
-                  className="ml-2 p-2 text-muted-foreground hover:text-destructive transition-colors"
-                >
+                <button onClick={() => removeItem(item.product.id, item.color, item.size)} className="ml-2 p-2 text-muted-foreground hover:text-destructive transition-colors">
                   <Trash2 size={16} />
                 </button>
               </div>
@@ -118,27 +107,17 @@ export default function Cart() {
       </div>
 
       <div className="border-t mt-8 pt-6">
-        {/* Promo Code Section */}
         <div className="mb-6">
           <div className="flex gap-2 mb-4">
             <div className="flex-1 relative">
               <Tag size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-              <input
-                type="text"
-                value={promoCode}
-                onChange={(e) => setPromoCode(e.target.value)}
-                placeholder="Code promo"
-                className="w-full pl-10 pr-4 py-3 border rounded-lg text-sm bg-background focus:outline-none focus:ring-1 focus:ring-primary"
-              />
+              <input type="text" value={promoCode} onChange={(e) => setPromoCode(e.target.value)} placeholder="Code promo"
+                className="w-full pl-10 pr-4 py-3 border rounded-lg text-sm bg-background focus:outline-none focus:ring-1 focus:ring-primary" />
             </div>
-            <button
-              onClick={handleApplyPromoCode}
-              className="px-6 py-3 text-sm font-medium bg-btn text-btn-foreground hover:bg-btn-hover rounded-lg transition-colors"
-            >
+            <button onClick={handleApplyPromoCode} className="px-6 py-3 text-sm font-medium bg-btn text-btn-foreground hover:bg-btn-hover rounded-lg transition-colors">
               Appliquer
             </button>
           </div>
-          
           {localDiscount > 0 && (
             <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
               <span className="text-sm font-medium text-green-800">Réduction appliquée</span>
@@ -147,7 +126,6 @@ export default function Cart() {
           )}
         </div>
 
-        {/* Total Section */}
         <div className="space-y-2">
           {localDiscount > 0 && (
             <div className="flex justify-between items-center text-sm">
@@ -155,18 +133,12 @@ export default function Cart() {
               <span className="font-medium">{totalPrice.toLocaleString()} F CFA</span>
             </div>
           )}
-          
           <div className="flex justify-between items-center mb-6">
             <span className="font-display text-xl font-medium">Total</span>
-            <span className="font-display text-2xl font-semibold">
-              {(totalPrice - localDiscount).toLocaleString()} F CFA
-            </span>
+            <span className="font-display text-2xl font-semibold">{(totalPrice - localDiscount).toLocaleString()} F CFA</span>
           </div>
         </div>
-        <Link
-          to="/checkout"
-          className="block w-full py-4 text-center text-sm font-medium tracking-wider uppercase bg-btn text-btn-foreground hover:bg-btn-hover transition-colors rounded-sm"
-        >
+        <Link to="/checkout" className="block w-full py-4 text-center text-sm font-medium tracking-wider uppercase bg-btn text-btn-foreground hover:bg-btn-hover transition-colors rounded-sm">
           Passer commande
         </Link>
       </div>

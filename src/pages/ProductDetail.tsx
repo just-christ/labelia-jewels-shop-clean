@@ -13,11 +13,12 @@ interface Product {
   name: string;
   description: string;
   price: number;
+  promoPrice?: number | null;
   category: string;
   sizes: string[];
   colors: string[];
   stock: number;
-  images: Record<string, string[]>; // {"argent": ["url1", "url2"], "doré": ["url1", "url2"]}
+  images: Record<string, string[]>;
   packagingImage?: string;
   videoUrl?: string;
 }
@@ -37,87 +38,62 @@ export default function ProductDetail() {
   useEffect(() => {
     const fetchProduct = async () => {
       if (!id) return;
-      
       try {
         const data = await apiClient.getProductById(id);
         setProduct(data);
-        // Set default color and size
-        if (data.colors && data.colors.length > 0) {
-          setSelectedColor(data.colors[0] as Color);
-        }
-        if (data.sizes && data.sizes.length > 0) {
-          setSelectedSize(data.sizes[0]);
-        }
+        if (data.colors && data.colors.length > 0) setSelectedColor(data.colors[0] as Color);
+        if (data.sizes && data.sizes.length > 0) setSelectedSize(data.sizes[0]);
       } catch (error) {
         console.error('Failed to fetch product:', error);
       } finally {
         setLoading(false);
       }
     };
-
     fetchProduct();
   }, [id]);
 
-  // Simuler le compteur de personnes qui regardent
   useEffect(() => {
-    // Générer un nombre aléatoire entre 8 et 28
     const generateViewersCount = () => Math.floor(Math.random() * 21) + 8;
     setViewersCount(generateViewersCount());
-
-    // Mettre à jour toutes les 3 heures (10800000 ms)
-    const interval = setInterval(() => {
-      setViewersCount(generateViewersCount());
-    }, 10800000);
-
+    const interval = setInterval(() => setViewersCount(generateViewersCount()), 10800000);
     return () => clearInterval(interval);
   }, []);
 
-  if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-20 text-center">
-        <p className="text-muted-foreground">Chargement...</p>
-      </div>
-    );
-  }
+  if (loading) return (
+    <div className="container mx-auto px-4 py-20 text-center">
+      <p className="text-muted-foreground">Chargement...</p>
+    </div>
+  );
 
-  if (!product) {
-    return (
-      <div className="container mx-auto px-4 py-20 text-center">
-        <h1 className="font-display text-3xl mb-4">Produit introuvable</h1>
-        <button onClick={() => navigate("/produits")} className="text-primary underline">
-          Retour aux produits
-        </button>
-      </div>
-    );
-  }
+  if (!product) return (
+    <div className="container mx-auto px-4 py-20 text-center">
+      <h1 className="font-display text-3xl mb-4">Produit introuvable</h1>
+      <button onClick={() => navigate("/produits")} className="text-primary underline">Retour aux produits</button>
+    </div>
+  );
 
   const handleAdd = () => {
-    if (!selectedSize) {
+    if (product.sizes && product.sizes.length > 0 && !selectedSize) {
       toast.error("Veuillez sélectionner une taille.");
       return;
     }
-    // Cast the product to match the expected CartContext Product type
     const cartProduct = {
       ...product,
-      category: product.category as any, // Cast to any to avoid type issues
-      colors: product.colors as any[], // Cast string[] to Color[]
-      images: product.images as any // Pass actual images data
+      category: product.category as any,
+      colors: product.colors as any[],
+      images: product.images as any,
     };
-    addItem(cartProduct, selectedColor, selectedSize);
+    addItem(cartProduct, selectedColor, selectedSize || "unique");
     toast.success(`${product.name} ajouté au panier !`);
   };
 
   return (
     <section className="container mx-auto px-4 py-12">
-      <button
-        onClick={() => navigate(-1)}
-        className="text-sm text-muted-foreground hover:text-foreground mb-8 inline-block"
-      >
+      <button onClick={() => navigate(-1)} className="text-sm text-muted-foreground hover:text-foreground mb-8 inline-block">
         ← Retour
       </button>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-        {/* Image Gallery */}
         <ProductGallery
           images={product.images}
           selectedColor={selectedColor}
@@ -126,20 +102,25 @@ export default function ProductDetail() {
           productName={product.name}
         />
 
-        {/* Details */}
         <div className="flex flex-col justify-center">
-          <p className="text-xs uppercase tracking-widest text-primary font-medium mb-2">
-            {product.category}
-          </p>
+          <p className="text-xs uppercase tracking-widest text-primary font-medium mb-2">{product.category}</p>
           <h1 className="font-display text-4xl font-semibold mb-2">{product.name}</h1>
-          <span className="text-3xl font-display font-medium">{product.price.toLocaleString()} F CFA</span>
+
+          {/* Prix — barré si promo */}
+          {product.promoPrice ? (
+            <div className="flex items-center gap-3 mb-2">
+              <span className="text-2xl font-display text-muted-foreground line-through">{product.price.toLocaleString()} F CFA</span>
+              <span className="text-3xl font-display font-semibold text-red-600">{product.promoPrice.toLocaleString()} F CFA</span>
+            </div>
+          ) : (
+            <span className="text-3xl font-display font-medium mb-2">{product.price.toLocaleString()} F CFA</span>
+          )}
+
           <p className="text-muted-foreground leading-relaxed mb-8">{product.description}</p>
 
           {/* Color selector */}
           <div className="mb-6">
-            <p className="text-sm font-medium mb-3">
-              Couleur : <span className="text-muted-foreground capitalize">{selectedColor}</span>
-            </p>
+            <p className="text-sm font-medium mb-3">Couleur : <span className="text-muted-foreground capitalize">{selectedColor}</span></p>
             <div className="flex gap-3">
               {product.colors.map((color) => (
                 <button
@@ -156,62 +137,50 @@ export default function ProductDetail() {
             </div>
           </div>
 
-          {/* Size selector */}
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-sm font-medium">Taille</p>
-              {product.category === 'bague' && (
-                <button
-                  onClick={() => setSizeGuideOpen(true)}
-                  className="flex items-center gap-1.5 text-xs text-primary hover:underline"
-                >
-                  <Ruler size={14} />
-                  Guide des tailles
-                </button>
-              )}
+          {/* Size selector — uniquement si le produit a des tailles */}
+          {product.sizes && product.sizes.length > 0 && (
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-medium">Taille</p>
+                {product.category === "bague" && (
+                  <button onClick={() => setSizeGuideOpen(true)} className="flex items-center gap-1.5 text-xs text-primary hover:underline">
+                    <Ruler size={14} />
+                    Guide des tailles
+                  </button>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {product.sizes.map((size) => (
+                  <button
+                    key={size}
+                    onClick={() => setSelectedSize(size)}
+                    className={`px-4 py-2 text-sm rounded-sm border transition-colors ${
+                      selectedSize === size ? "bg-btn text-btn-foreground border-btn" : "border-border hover:border-foreground"
+                    }`}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {product.sizes.map((size) => (
-                <button
-                  key={size}
-                  onClick={() => setSelectedSize(size)}
-                  className={`px-4 py-2 text-sm rounded-sm border transition-colors ${
-                    selectedSize === size
-                      ? "bg-btn text-btn-foreground border-btn"
-                      : "border-border hover:border-foreground"
-                  }`}
-                >
-                  {size}
-                </button>
-              ))}
-            </div>
-          </div>
+          )}
 
-          {/* Add to cart */}
-          <button
-            onClick={handleAdd}
-            className="w-full py-4 text-sm font-medium tracking-wider uppercase bg-btn text-btn-foreground hover:bg-btn-hover transition-colors rounded-sm mt-4"
-          >
+          <button onClick={handleAdd} className="w-full py-4 text-sm font-medium tracking-wider uppercase bg-btn text-btn-foreground hover:bg-btn-hover transition-colors rounded-sm mt-4">
             Ajouter au panier
           </button>
 
-          {/* Viewers count */}
           <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
             <div className="relative">
               <Eye size={14} className="text-green-500 animate-pulse" />
               <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full animate-ping" />
             </div>
-            <span>{viewersCount} personne{viewersCount > 1 ? 's' : ''} regardent ce produit</span>
+            <span>{viewersCount} personne{viewersCount > 1 ? "s" : ""} regardent ce produit</span>
           </div>
         </div>
       </div>
 
-      {product.category === 'bague' && (
-        <SizeGuideModal
-          open={sizeGuideOpen}
-          onOpenChange={setSizeGuideOpen}
-          category={product.category as any} // Cast to avoid type issues
-        />
+      {product.category === "bague" && (
+        <SizeGuideModal open={sizeGuideOpen} onOpenChange={setSizeGuideOpen} category={product.category as any} />
       )}
     </section>
   );

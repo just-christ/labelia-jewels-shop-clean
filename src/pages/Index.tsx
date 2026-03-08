@@ -48,7 +48,6 @@ export default function Index() {
         setLoading(false);
       }
     };
-
     fetchBestSellers();
   }, []);
 
@@ -56,21 +55,12 @@ export default function Index() {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 5000);
-
     return () => clearInterval(timer);
   }, [slides.length]);
 
-  const goToSlide = (index: number) => {
-    setCurrentSlide(index);
-  };
-
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % slides.length);
-  };
-
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-  };
+  const goToSlide = (index: number) => setCurrentSlide(index);
+  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % slides.length);
+  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
 
   const getFirstImage = (product: any) => {
     if (product.images && typeof product.images === 'object') {
@@ -82,7 +72,6 @@ export default function Index() {
         }
       }
     }
-
     const bgColor = product.colors?.[0] === 'doré' ? 'FFD700' : 'C0C0C0';
     return `data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Crect fill='%23${bgColor}' width='200' height='200' rx='12'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-family='Arial' font-size='14' font-weight='bold'%3E${encodeURIComponent(product.name.substring(0, 10))}%3C/text%3E%3C/svg%3E`;
   };
@@ -130,22 +119,17 @@ export default function Index() {
       <section className="container mx-auto px-4 py-20">
         <h2 className="font-display text-3xl font-semibold text-center mb-12">Nos catégories</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {categories.map((cat) => {
-            const dbCategory = cat.name === 'chaînes' ? 'chaîne' :
-                              cat.name === 'bracelets' ? 'bracelet' :
-                              cat.name === 'bagues' ? 'bague' : cat.name;
-            return (
-              <Link
-                key={cat.name}
-                to={`/produits?categorie=${cat.name}`}
-                className="group relative bg-secondary rounded-sm p-10 text-center hover:bg-accent transition-colors"
-              >
-                <h3 className="font-display text-2xl font-medium group-hover:text-primary transition-colors">
-                  {cat.label}
-                </h3>
-              </Link>
-            );
-          })}
+          {categories.map((cat) => (
+            <Link
+              key={cat.name}
+              to={`/produits?categorie=${cat.name}`}
+              className="group relative bg-secondary rounded-sm p-10 text-center hover:bg-accent transition-colors"
+            >
+              <h3 className="font-display text-2xl font-medium group-hover:text-primary transition-colors">
+                {cat.label}
+              </h3>
+            </Link>
+          ))}
         </div>
       </section>
 
@@ -192,9 +176,14 @@ export default function Index() {
                       {product.name}
                     </h3>
                     <p className="text-muted-foreground text-sm line-clamp-2">{product.description}</p>
-                    <div className="flex items-center justify-between">
+                    {product.promoPrice ? (
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg text-muted-foreground line-through">{product.price.toLocaleString()} F CFA</span>
+                        <span className="text-2xl font-display font-semibold text-red-600">{product.promoPrice.toLocaleString()} F CFA</span>
+                      </div>
+                    ) : (
                       <span className="text-2xl font-display font-medium">{product.price.toLocaleString()} F CFA</span>
-                    </div>
+                    )}
                   </div>
                 </Link>
               </div>
