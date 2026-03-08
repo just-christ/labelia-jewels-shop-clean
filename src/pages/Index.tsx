@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { categories } from "@/data/products";
 import { apiClient } from "@/lib/api";
-import { Star } from "lucide-react";
+import { Sparkles, Heart, Shield, Star } from "lucide-react";
 
 export default function Index() {
   const [bestSellers, setBestSellers] = useState<any[]>([]);
@@ -204,7 +204,6 @@ export default function Index() {
           )}
         </div>
       </section>
-
       {/* CTA */}
       <section className="container mx-auto px-4 py-20 text-center">
         <Link
@@ -214,6 +213,29 @@ export default function Index() {
           Voir toute la collection →
         </Link>
       </section>
+
+      {/* Why Labélia */}
+      <section className="bg-secondary/50 py-20">
+        <div className="container mx-auto px-4">
+          <h2 className="font-display text-3xl font-semibold text-center mb-12">Pourquoi Labélia</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { icon: Sparkles, title: "Qualité premium", desc: "Des matériaux soigneusement sélectionnés pour une durabilité exceptionnelle." },
+              { icon: Heart, title: "Design épuré", desc: "Des lignes minimalistes qui s'adaptent à tous les styles." },
+              { icon: Shield, title: "Achat sécurisé", desc: "Paiement sécurisé et livraison soignée pour chaque commande." },
+            ].map((item) => (
+              <div key={item.title} className="text-center p-6">
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary mb-4">
+                  <item.icon size={22} />
+                </div>
+                <h3 className="font-display text-xl font-medium mb-2">{item.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
     </>
   );
 }
