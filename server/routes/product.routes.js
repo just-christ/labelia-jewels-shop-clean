@@ -1,10 +1,10 @@
 import express from 'express';
-import { 
-  getProducts, 
-  getProductById, 
-  createProduct, 
-  updateProduct, 
-  deleteProduct 
+import {
+  getProducts,
+  getProductById,
+  createProduct,
+  updateProduct,
+  deleteProduct
 } from '../controllers/product.controller.js';
 import { authenticateToken, requireAdmin } from '../middleware/auth.middleware.js';
 

@@ -14,7 +14,7 @@ export default function AnnouncementBar() {
         {Array.from({ length: 8 }).map((_, i) => (
           <span key={i} style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexShrink: 0 }}>
             <Gift size={13} />
-            Livraison gratuite dès votre première commande
+            Livraison gratuite pour les bijoux en argent pur !
           </span>
         ))}
       </div>
