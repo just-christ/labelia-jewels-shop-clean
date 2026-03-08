@@ -6,6 +6,12 @@ import { Tag } from "lucide-react";
 import { apiClient } from "@/lib/api";
 import { toast } from "sonner";
 
+// ✅ Helper pour gérer les URLs Cloudinary ET les images locales
+function getImageUrl(img: string): string {
+  if (!img) return "";
+  return img.startsWith("http") ? img : `/Images/${img}`;
+}
+
 export default function Cart() {
   const { items, updateQuantity, removeItem, totalPrice, setDiscount } = useCart();
   const [promoCode, setPromoCode] = useState("");
@@ -21,7 +27,6 @@ export default function Cart() {
       const response = await apiClient.validatePromoCode(promoCode);
       
       if (response.valid) {
-        // Calculer la réduction
         let discountAmount = 0;
         if (response.promotion.isPercentage) {
           discountAmount = (totalPrice * response.promotion.discount) / 100;
@@ -30,7 +35,7 @@ export default function Cart() {
         }
         
         setLocalDiscount(discountAmount);
-        setDiscount(discountAmount); // Mettre à jour le CartContext
+        setDiscount(discountAmount);
         toast.success(`Code promo appliqué : -${discountAmount.toLocaleString()} F CFA`);
       } else {
         toast.error(response.message || "Code promo invalide");
@@ -60,51 +65,56 @@ export default function Cart() {
       <h1 className="font-display text-4xl font-semibold mb-8">Votre panier</h1>
 
       <div className="space-y-4">
-        {items.map((item) => (
-          <div
-            key={`${item.product.id}-${item.color}-${item.size}`}
-            className="flex gap-4 p-4 border rounded-sm"
-          >
-            <div className="w-20 h-20 bg-secondary rounded-sm overflow-hidden flex-shrink-0">
-              <img
-                src={item.product.images[item.color]?.[0] 
-                  ? `/Images/${item.product.images[item.color][0]}` 
-                  : `data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Crect fill='%23C0C0C0' width='200' height='200' rx='12'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-family='Arial' font-size='14' font-weight='bold'%3E${encodeURIComponent(item.product.name.substring(0, 10))}%3C/text%3E%3C/svg%3E`}
-                alt={item.product.name}
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
+        {items.map((item) => {
+          const firstImg = item.product.images[item.color]?.[0];
+          const imgSrc = firstImg
+            ? getImageUrl(firstImg)
+            : `data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Crect fill='%23C0C0C0' width='200' height='200' rx='12'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='white' font-family='Arial' font-size='14' font-weight='bold'%3E${encodeURIComponent(item.product.name.substring(0, 10))}%3C/text%3E%3C/svg%3E`;
+
+          return (
+            <div
+              key={`${item.product.id}-${item.color}-${item.size}`}
+              className="flex gap-4 p-4 border rounded-sm"
+            >
+              <div className="w-20 h-20 bg-secondary rounded-sm overflow-hidden flex-shrink-0">
+                <img
+                  src={imgSrc}
+                  alt={item.product.name}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-display text-lg font-medium">{item.product.name}</h3>
+                <p className="text-xs text-muted-foreground capitalize">
+                  {item.color} · {item.size}
+                </p>
+                <p className="text-sm font-medium mt-1">{item.product.price.toLocaleString()} F CFA</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => updateQuantity(item.product.id, item.color, item.size, item.quantity - 1)}
+                  className="w-8 h-8 flex items-center justify-center border rounded-sm hover:bg-secondary transition-colors"
+                >
+                  <Minus size={14} />
+                </button>
+                <span className="w-8 text-center text-sm font-medium">{item.quantity}</span>
+                <button
+                  onClick={() => updateQuantity(item.product.id, item.color, item.size, item.quantity + 1)}
+                  className="w-8 h-8 flex items-center justify-center border rounded-sm hover:bg-secondary transition-colors"
+                >
+                  <Plus size={14} />
+                </button>
+                <button
+                  onClick={() => removeItem(item.product.id, item.color, item.size)}
+                  className="ml-2 p-2 text-muted-foreground hover:text-destructive transition-colors"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
             </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="font-display text-lg font-medium">{item.product.name}</h3>
-              <p className="text-xs text-muted-foreground capitalize">
-                {item.color} · {item.size}
-              </p>
-              <p className="text-sm font-medium mt-1">{item.product.price.toLocaleString()} F CFA</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => updateQuantity(item.product.id, item.color, item.size, item.quantity - 1)}
-                className="w-8 h-8 flex items-center justify-center border rounded-sm hover:bg-secondary transition-colors"
-              >
-                <Minus size={14} />
-              </button>
-              <span className="w-8 text-center text-sm font-medium">{item.quantity}</span>
-              <button
-                onClick={() => updateQuantity(item.product.id, item.color, item.size, item.quantity + 1)}
-                className="w-8 h-8 flex items-center justify-center border rounded-sm hover:bg-secondary transition-colors"
-              >
-                <Plus size={14} />
-              </button>
-              <button
-                onClick={() => removeItem(item.product.id, item.color, item.size)}
-                className="ml-2 p-2 text-muted-foreground hover:text-destructive transition-colors"
-              >
-                <Trash2 size={16} />
-              </button>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="border-t mt-8 pt-6">
