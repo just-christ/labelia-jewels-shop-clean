@@ -69,6 +69,7 @@ const emptyProduct = {
   category: "bague",
   sizes: [] as string[],
   colors: ["argent"] as string[],
+  stock: 0,
   images: { argent: [], doré: [] } as Record<string, string[]>,
   packagingImage: "",
   videoUrl: "",
@@ -301,6 +302,7 @@ export default function AdminProducts() {
       category: p.category,
       sizes: p.sizes,
       colors: p.colors,
+      stock: p.stock,
       images: p.images || { argent: [], doré: [] },
       packagingImage: p.packagingImage || "",
       videoUrl: p.videoUrl || "",
@@ -384,6 +386,12 @@ export default function AdminProducts() {
                       ) : (
                         <p className="text-sm font-semibold">{p.price.toLocaleString()} F CFA</p>
                       )}
+                      {p.stock === 0 && (
+                        <div className="flex items-center gap-1 text-red-600 text-xs font-medium mt-1">
+                          <span className="w-1.5 h-1.5 bg-red-600 rounded-full"></span>
+                          Rupture de stock
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className="flex flex-col gap-1 shrink-0">
@@ -427,6 +435,12 @@ export default function AdminProducts() {
                           </div>
                         ) : (
                           <span>{p.price.toLocaleString()} F CFA</span>
+                        )}
+                        {p.stock === 0 && (
+                          <div className="flex items-center gap-1 text-red-600 text-xs font-medium mt-1">
+                            <span className="w-1.5 h-1.5 bg-red-600 rounded-full"></span>
+                            Rupture de stock
+                          </div>
                         )}
                       </td>
                       <td className="px-4 py-3">
@@ -607,6 +621,19 @@ export default function AdminProducts() {
                 value={form.videoUrl || ""}
                 onChange={(e) => setForm({ ...form, videoUrl: e.target.value })}
                 placeholder="https://..."
+                className="w-full border rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground"
+              />
+            </div>
+
+            {/* Stock */}
+            <div>
+              <label className="block text-sm font-medium mb-1">Stock</label>
+              <input
+                type="number"
+                value={form.stock || 0}
+                onChange={(e) => setForm({ ...form, stock: Number(e.target.value) })}
+                placeholder="0"
+                min="0"
                 className="w-full border rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground"
               />
             </div>

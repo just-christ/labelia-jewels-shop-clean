@@ -233,6 +233,12 @@ export default function AdminCreateProducts() {
                     </div>
                     <div>
                       <span className="font-medium">Stock:</span> {product.stock}
+                      {product.stock === 0 && (
+                        <div className="flex items-center gap-1 text-red-600 text-xs font-medium mt-1">
+                          <span className="w-1.5 h-1.5 bg-red-600 rounded-full"></span>
+                          Rupture de stock
+                        </div>
+                      )}
                     </div>
                   </div>
 
