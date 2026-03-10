@@ -11,7 +11,7 @@ export default function Index() {
 
   const slides = [
     {
-      image: "/Images/IMG_2084.jpg",
+      image: "https://res.cloudinary.com/dy5yusdni/image/upload/f_auto,q_auto,w_1200/v1773180941/IMG_2084_ut8ou6",
       title: "Collection DIAMOND UNIVERS",
       subtitle: "Des bijoux rares, des émotions précieuses",
       description: "Un trésor pour celle qui compte le plus...",
@@ -19,7 +19,7 @@ export default function Index() {
       buttonLink: "/produits",
     },
     {
-      image: "/Images/IMG_2125.jpg",
+      image: "https://res.cloudinary.com/dy5yusdni/image/upload/f_auto,q_auto,w_1200/v1773180969/IMG_2125_tccmjv",
       title: "Élégance et Raffinement",
       subtitle: "Diamant moissanite et argent pur",
       description: "Conçus pour briller toute une vie",
@@ -27,7 +27,7 @@ export default function Index() {
       buttonLink: "/produits",
     },
     {
-      image: "/Images/IMG_2107.jpg",
+      image: "https://res.cloudinary.com/dy5yusdni/image/upload/f_auto,q_auto,w_1200/v1773180995/IMG_2107_z2xxyn",
       title: "Le luxe de dire je t'aime...",
       subtitle: "Des bijoux, des promesses",
       description: "Célébrez vos plus beaux moments",
@@ -100,6 +100,10 @@ export default function Index() {
                 src={slide.image}
                 alt={slide.title}
                 className="w-full h-full object-cover"
+                loading="eager"
+                fetchpriority="high"
+                width={1200}
+                height={800}
               />
               <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent" />
             </div>

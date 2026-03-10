@@ -11,7 +11,7 @@ const storage = new CloudinaryStorage({
     folder: 'labelia', // Dossier pour organiser les images
     allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
     transformation: [
-      { width: 1200, height: 1200, crop: 'limit', quality: 'auto' }
+      { width: 1200, height: 1200, crop: 'limit', quality: 'auto', fetch_format: 'auto' }
     ]
   },
   filename: (req, file, cb) => {
