@@ -77,6 +77,13 @@ export default function ProductDetail() {
       toast.error("Veuillez sélectionner une taille.");
       return;
     }
+    
+    // Vérifier si le produit est en rupture de stock
+    if (product.stock === 0) {
+      toast.error("Ce produit est actuellement en rupture de stock.");
+      return;
+    }
+    
     const cartProduct = {
       ...product,
       category: product.category as any,
@@ -115,6 +122,26 @@ export default function ProductDetail() {
           ) : (
             <span className="text-3xl font-display font-medium mb-2">{product.price.toLocaleString()} F CFA</span>
           )}
+
+          {/* Statut du stock */}
+          <div className="mb-4">
+            {product.stock === 0 ? (
+              <div className="flex items-center gap-2 text-red-600 font-medium">
+                <span className="w-2 h-2 bg-red-600 rounded-full"></span>
+                En rupture de stock
+              </div>
+            ) : product.stock <= 5 ? (
+              <div className="flex items-center gap-2 text-orange-600 font-medium">
+                <span className="w-2 h-2 bg-orange-600 rounded-full"></span>
+                Plus que {product.stock} exemplaire{product.stock > 1 ? 's' : ''} disponible{product.stock > 1 ? 's' : ''}
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 text-green-600 font-medium">
+                <span className="w-2 h-2 bg-green-600 rounded-full"></span>
+                En stock
+              </div>
+            )}
+          </div>
 
           <p className="text-muted-foreground leading-relaxed mb-8">{product.description}</p>
 
@@ -165,8 +192,16 @@ export default function ProductDetail() {
             </div>
           )}
 
-          <button onClick={handleAdd} className="w-full py-4 text-sm font-medium tracking-wider uppercase bg-btn text-btn-foreground hover:bg-btn-hover transition-colors rounded-sm mt-4">
-            Ajouter au panier
+          <button 
+            onClick={handleAdd} 
+            disabled={product.stock === 0}
+            className={`w-full py-4 text-sm font-medium tracking-wider uppercase rounded-sm mt-4 transition-colors ${
+              product.stock === 0 
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
+                : "bg-btn text-btn-foreground hover:bg-btn-hover"
+            }`}
+          >
+            {product.stock === 0 ? "En rupture de stock" : "Ajouter au panier"}
           </button>
 
           <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">

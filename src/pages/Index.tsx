@@ -198,6 +198,14 @@ export default function Index() {
                       {product.price.toLocaleString()} F CFA
                     </span>
                   )}
+
+                  {/* Statut du stock */}
+                  {product.stock === 0 && (
+                    <div className="flex items-center gap-1 text-red-600 text-xs font-medium mt-1">
+                      <span className="w-1.5 h-1.5 bg-red-600 rounded-full"></span>
+                      Rupture de stock
+                    </div>
+                  )}
                 </Link>
               </div>
             ))

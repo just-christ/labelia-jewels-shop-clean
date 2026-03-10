@@ -13,6 +13,7 @@ interface Product {
   sizes: string[];
   colors: string[];
   images: Record<string, string[]>;
+  stock: number;
   packagingImage?: string;
   videoUrl?: string;
 }
@@ -129,6 +130,14 @@ export default function Products() {
                   </div>
                 ) : (
                   <span className="text-2xl font-display font-medium text-foreground">{product.price.toLocaleString()} F CFA</span>
+                )}
+                
+                {/* Statut du stock */}
+                {product.stock === 0 && (
+                  <div className="flex items-center gap-1 text-red-600 text-xs font-medium">
+                    <span className="w-1.5 h-1.5 bg-red-600 rounded-full"></span>
+                    Rupture de stock
+                  </div>
                 )}
               </div>
             </Link>
