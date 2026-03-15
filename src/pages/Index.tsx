@@ -40,8 +40,8 @@ export default function Index() {
     const fetchBestSellers = async () => {
       try {
         setLoading(true);
-        const products = await apiClient.getProducts();
-        setBestSellers(products.slice(0, 3));
+        const bestSellers = await apiClient.getBestSellers();  // 🌟 Appelle la nouvelle API
+        setBestSellers(bestSellers.slice(0, 3));
       } catch (error) {
         console.error("Failed to fetch best sellers:", error);
       } finally {
@@ -101,7 +101,7 @@ export default function Index() {
                 alt={slide.title}
                 className="w-full h-full object-cover"
                 loading="eager"
-                fetchpriority="high"
+                fetchPriority="high"
                 width={1200}
                 height={800}
               />

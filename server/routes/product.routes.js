@@ -1,6 +1,7 @@
 import express from 'express';
 import {
   getProducts,
+  getBestSellers,
   getProductById,
   createProduct,
   updateProduct,
@@ -12,6 +13,7 @@ const router = express.Router();
 
 // Public routes
 router.get('/', getProducts);
+router.get('/best-sellers', getBestSellers);  // 🌟 Nouvelle route pour les best sellers
 router.get('/:id', getProductById);
 
 // Admin routes

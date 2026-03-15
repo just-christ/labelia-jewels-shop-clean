@@ -12,6 +12,22 @@ export const getProducts = async (req, res) => {
   }
 };
 
+export const getBestSellers = async (req, res) => {
+  try {
+    const bestSellers = await prisma.product.findMany({
+      where: { isBestSeller: true },
+      orderBy: [
+        { bestSellerOrder: 'asc' },
+        { createdAt: 'desc' }
+      ]
+    });
+    res.json(bestSellers);
+  } catch (error) {
+    console.error('Get best sellers error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
 export const getProductById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -73,7 +89,11 @@ export const createProduct = async (req, res) => {
 export const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description, price, promoPrice, category, colors, sizes, stock, images, packagingImage, videoUrl } = req.body;
+    const {
+      name, description, price, promoPrice, category,
+      colors, sizes, stock, images, packagingImage, videoUrl,
+      isBestSeller, bestSellerOrder
+    } = req.body;
 
     const updateData = {};
     if (name !== undefined) updateData.name = name;
@@ -87,6 +107,10 @@ export const updateProduct = async (req, res) => {
     if (images !== undefined) updateData.images = images || [];
     if (packagingImage !== undefined) updateData.packagingImage = packagingImage;
     if (videoUrl !== undefined) updateData.videoUrl = videoUrl;
+
+    // 🌟 Best seller
+    if (isBestSeller !== undefined) updateData.isBestSeller = Boolean(isBestSeller);
+    if (bestSellerOrder !== undefined) updateData.bestSellerOrder = bestSellerOrder ? parseInt(bestSellerOrder) : null;
 
     updateData.updatedAt = new Date();
 

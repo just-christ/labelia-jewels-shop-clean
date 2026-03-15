@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { apiClient } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Pencil, Trash2, Plus, X, Check, ChevronDown, ChevronUp, Image as ImageIcon } from "lucide-react";
+import { Pencil, Trash2, Plus, X, Check, ChevronDown, ChevronUp, Image as ImageIcon, Star } from "lucide-react";
 import ImageUpload from "@/components/ImageUpload";
 
 interface Product {
@@ -16,6 +16,8 @@ interface Product {
   sizes: string[];
   colors: string[];
   stock: number;
+  isBestSeller: boolean;
+  bestSellerOrder?: number | null;
   images: Record<string, string[]>;
   packagingImage?: string;
   videoUrl?: string;
@@ -70,6 +72,8 @@ const emptyProduct = {
   sizes: [] as string[],
   colors: ["argent"] as string[],
   stock: 0,
+  isBestSeller: false,
+  bestSellerOrder: null as number | null,
   images: { argent: [], doré: [] } as Record<string, string[]>,
   packagingImage: "",
   videoUrl: "",
@@ -303,6 +307,8 @@ export default function AdminProducts() {
       sizes: p.sizes,
       colors: p.colors,
       stock: p.stock,
+      isBestSeller: p.isBestSeller || false,
+      bestSellerOrder: p.bestSellerOrder || null,
       images: p.images || { argent: [], doré: [] },
       packagingImage: p.packagingImage || "",
       videoUrl: p.videoUrl || "",
@@ -375,7 +381,12 @@ export default function AdminProducts() {
                     {img ? <img src={img} alt={p.name} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><ImageIcon size={20} className="text-muted-foreground/40" /></div>}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm truncate">{p.name}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="font-medium text-sm truncate">{p.name}</p>
+                      {p.isBestSeller && (
+                        <Star size={14} className="text-yellow-500 fill-yellow-500" />
+                      )}
+                    </div>
                     <p className="text-xs text-muted-foreground capitalize">{p.category}</p>
                     <div className="mt-0.5">
                       {p.promoPrice ? (
@@ -425,7 +436,14 @@ export default function AdminProducts() {
                           {img ? <img src={img} alt={p.name} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center"><ImageIcon size={16} className="text-muted-foreground/40" /></div>}
                         </div>
                       </td>
-                      <td className="px-4 py-3 font-medium text-sm">{p.name}</td>
+                      <td className="px-4 py-3 font-medium text-sm">
+                        <div className="flex items-center gap-2">
+                          {p.name}
+                          {p.isBestSeller && (
+                            <Star size={14} className="text-yellow-500 fill-yellow-500" />
+                          )}
+                        </div>
+                      </td>
                       <td className="px-4 py-3 text-sm capitalize">{p.category}</td>
                       <td className="px-4 py-3 text-sm">
                         {p.promoPrice ? (
@@ -636,6 +654,35 @@ export default function AdminProducts() {
                 min="0"
                 className="w-full border rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground"
               />
+            </div>
+
+            {/* 🌟 Best Seller */}
+            <div>
+              <label className="flex items-center gap-2 text-sm font-medium mb-1 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={form.isBestSeller || false}
+                  onChange={(e) => setForm({ ...form, isBestSeller: e.target.checked, bestSellerOrder: e.target.checked ? (form.bestSellerOrder || 1) : null })}
+                  className="rounded border-gray-300 text-primary focus:ring-primary"
+                />
+                <span className="flex items-center gap-1">
+                  <Star size={16} className="text-yellow-500" />
+                  Best Seller
+                </span>
+              </label>
+              {form.isBestSeller && (
+                <div className="mt-2">
+                  <label className="block text-xs text-muted-foreground mb-1">Ordre d'affichage (1 = premier)</label>
+                  <input
+                    type="number"
+                    value={form.bestSellerOrder || 1}
+                    onChange={(e) => setForm({ ...form, bestSellerOrder: Number(e.target.value) })}
+                    placeholder="1"
+                    min="1"
+                    className="w-full border rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-foreground"
+                  />
+                </div>
+              )}
             </div>
 
             <button

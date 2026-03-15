@@ -40,6 +40,11 @@ class ApiClient {
     return this.request('/products');
   }
 
+  // 🌟 Nouvelle méthode pour récupérer les best sellers
+  async getBestSellers() {
+    return this.request('/products/best-sellers');
+  }
+
   async getProductById(id: string) {
     return this.request(`/products/${id}`);
   }
