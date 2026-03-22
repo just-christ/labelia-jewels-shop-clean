@@ -5,6 +5,7 @@ interface OrderItem {
   product: {
     name: string;
     price: number;
+    description?: string;  // 🆕 Ajout de la description
   };
   color: string;
   size: string;
@@ -61,7 +62,7 @@ export function generateReceipt(data: ReceiptData): void {
   // Bloc logo texte
   text("LABELIA", W / 2, 22, "bold", "center", [20, 20, 20]);
   nl(8);
-  text("Bijoux en Argent pur", W / 2, 9, "italic", "center", [230, 126, 173]);
+  text("Bijoux en Argent pur ou Acier Inoxydable", W / 2, 9, "italic", "center", [230, 126, 173]);
   nl(8);
   separator();
 
@@ -161,7 +162,25 @@ export function generateReceipt(data: ReceiptData): void {
     );
   }
 
-  row("Livraison", "Offerte", false, [34, 139, 34]);
+  // 🧾 Détecter le type de matériau dans la commande (nom + description)
+  const hasAcier = data.items.some(item => {
+    const name = item.product.name.toLowerCase();
+    const description = (item.product.description || '').toLowerCase();
+    
+    return name.includes('acier') || 
+           name.includes('inox') ||
+           name.includes('steel') ||
+           description.includes('acier') || 
+           description.includes('inox') ||
+           description.includes('steel') ||
+           description.includes('acier inoxydable');
+  });
+
+  if (hasAcier) {
+    row("Livraison", "Payante", false, [34, 139, 34]);
+  } else {
+    row("Livraison", "Offerte", false, [34, 139, 34]);
+  }
   nl(2);
 
   // Total

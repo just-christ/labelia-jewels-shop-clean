@@ -67,7 +67,11 @@ export default function Checkout() {
           const price = (i.product as any).promoPrice ?? i.product.price;
 
           return {
-            product: { name: i.product.name, price: price },
+            product: { 
+              name: i.product.name, 
+              price: price,
+              description: i.product.description || ''  // 🆕 Ajout de la description
+            },
             color: i.color,
             size: i.size,
             quantity: i.quantity,
