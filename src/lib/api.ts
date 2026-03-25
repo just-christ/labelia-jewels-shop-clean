@@ -55,6 +55,16 @@ class ApiClient {
     });
   }
 
+  // 🆕 Supprimer un admin
+  async deleteAdmin(id: string, token: string) {
+    return this.request(`/auth/admins/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+  }
+
   // Products
   async getProducts() {
     return this.request('/products');

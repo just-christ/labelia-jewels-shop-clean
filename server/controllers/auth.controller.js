@@ -117,3 +117,39 @@ export const getAdmins = async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+// 🆕 Route pour supprimer un admin
+export const deleteAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const requestingUser = req.user;
+
+    // Vérifier si l'admin existe
+    const adminToDelete = await prisma.user.findUnique({
+      where: { id }
+    });
+
+    if (!adminToDelete) {
+      return res.status(404).json({ error: 'Admin not found' });
+    }
+
+    if (adminToDelete.role !== 'admin') {
+      return res.status(400).json({ error: 'User is not an admin' });
+    }
+
+    // Empêcher la suppression de soi-même
+    if (adminToDelete.id === requestingUser.userId) {
+      return res.status(400).json({ error: 'Cannot delete your own account' });
+    }
+
+    // Supprimer l'admin
+    await prisma.user.delete({
+      where: { id }
+    });
+
+    res.json({ message: 'Admin deleted successfully' });
+  } catch (error) {
+    console.error('Delete admin error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};

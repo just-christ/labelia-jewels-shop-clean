@@ -47,11 +47,16 @@ export default function AdminDashboard() {
       const token = localStorage.getItem("authToken");
 
       if (!token || token === "null" || token === "undefined") {
-        setStats({ totalProducts: products.length, totalOrders: 0, totalUsers: 1, totalRevenue: 0, recentOrders: [] });
+        setStats({ totalProducts: products.length, totalOrders: 0, totalUsers: 0, totalRevenue: 0, recentOrders: [] });
         return;
       }
 
-      const orders = await apiClient.getOrders(token);
+      // 🆕 Récupérer les vraies données
+      const [orders, customers] = await Promise.all([
+        apiClient.getOrders(token),
+        apiClient.getCustomers(token)
+      ]);
+
       const paidOrders = orders.filter((order: any) => 
         order.status === 'payée' || order.status === 'paid'
       );
@@ -59,8 +64,8 @@ export default function AdminDashboard() {
       setStats({
         totalProducts: products.length,
         totalOrders: orders.length,
-        totalUsers: 1,
-        totalRevenue: paidOrders.reduce((sum: number, order: any) => sum + (order.totalAmount || order.total || 0), 0),
+        totalUsers: customers.length,  // 🆕 VRAI NOMBRE DE CLIENTS
+        totalRevenue: paidOrders.reduce((sum: number, order: any) => sum + (order.total || 0), 0),  // ✅ CORRECTION totalAmount → total
         recentOrders: orders.slice(0, 5),
       });
     } catch (error: any) {
@@ -153,10 +158,33 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleDeleteAdmin = async (id: string) => {
-    if (!confirm("Supprimer ce compte admin ?")) return;
-    setAdminUsers(adminUsers.filter((u) => u.id !== id));
-    toast.success("Compte supprimé !");
+  const handleDeleteAdmin = async (id: string, email: string) => {
+    if (!confirm(`Supprimer le compte admin "${email}" ?`)) return;
+    
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        toast.error("Session expirée. Veuillez vous reconnecter.");
+        return;
+      }
+      
+      // 🆕 Appel API pour supprimer l'admin
+      await apiClient.deleteAdmin(id, token);
+      
+      // Rafraîchir la liste
+      await fetchAdminUsers();
+      
+      toast.success("Compte admin supprimé !");
+      
+      // Si c'est le compte courant, déconnexion
+      if (email === user?.email) {
+        localStorage.removeItem('authToken');
+        window.location.href = '/admin/login';
+      }
+    } catch (error: any) {
+      console.error('Delete admin error:', error);
+      toast.error("Erreur lors de la suppression du compte.");
+    }
   };
 
   const statCards = [
@@ -225,7 +253,7 @@ export default function AdminDashboard() {
                   <p className="text-xs text-muted-foreground mt-0.5">{new Date(order.createdAt).toLocaleDateString("fr-FR")}</p>
                 </div>
                 <div className="text-right ml-3 shrink-0">
-                  <p className="text-sm font-semibold">{order.totalAmount?.toLocaleString()} F</p>
+                  <p className="text-sm font-semibold">{order.total?.toLocaleString()} F</p>
                   <span className={`text-xs px-2 py-0.5 rounded-full ${statusColors[order.status] || 'bg-gray-100 text-gray-800'}`}>
                     {statusLabels[order.status] || order.status}
                   </span>
@@ -260,8 +288,9 @@ export default function AdminDashboard() {
                 <button className="p-1.5 hover:text-primary transition-colors rounded">
                   <Edit size={14} />
                 </button>
-                {adminUser.email !== "admin@labelia.fr" && (
-                  <button onClick={() => handleDeleteAdmin(adminUser.id)} className="p-1.5 hover:text-destructive transition-colors rounded">
+                {/* 🛡️ Protection du compte chrisk.dev@gmail.com */}
+                {adminUser.email !== user?.email && adminUser.email !== "chrisk.dev@gmail.com" && (
+                  <button onClick={() => handleDeleteAdmin(adminUser.id, adminUser.email)} className="p-1.5 hover:text-destructive transition-colors rounded">
                     <Trash2 size={14} />
                   </button>
                 )}
