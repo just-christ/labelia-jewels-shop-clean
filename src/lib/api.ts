@@ -35,6 +35,26 @@ class ApiClient {
     });
   }
 
+  // 🆕 Créer un compte admin
+  async registerAdmin(email: string, password: string, token: string) {
+    return this.request('/auth/register-admin', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ email, password }),
+    });
+  }
+
+  // 🆕 Récupérer la liste des admins
+  async getAdmins(token: string) {
+    return this.request('/auth/admins', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+  }
+
   // Products
   async getProducts() {
     return this.request('/products');

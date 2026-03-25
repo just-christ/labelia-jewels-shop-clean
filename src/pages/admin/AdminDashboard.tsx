@@ -80,7 +80,21 @@ export default function AdminDashboard() {
   };
 
   const fetchAdminUsers = async () => {
-    setAdminUsers([{ id: "1", email: "admin@labelia.fr", role: "admin", createdAt: new Date().toISOString() }]);
+    try {
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        setAdminUsers([{ id: "1", email: "admin@labelia.fr", role: "admin", createdAt: new Date().toISOString() }]);
+        return;
+      }
+      
+      // 🆕 Récupérer les vrais admins depuis la BDD
+      const admins = await apiClient.getAdmins(token);
+      setAdminUsers(admins);
+    } catch (error) {
+      console.error('Failed to fetch admin users:', error);
+      // Fallback en cas d'erreur
+      setAdminUsers([{ id: "1", email: "admin@labelia.fr", role: "admin", createdAt: new Date().toISOString() }]);
+    }
   };
 
   const statusLabels: Record<string, string> = {
@@ -104,14 +118,39 @@ export default function AdminDashboard() {
   const handleAddAdmin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (newAdminPassword.length < 6) { toast.error("Mot de passe trop court (min. 6 caractères)."); return; }
+    
     setLoading(true);
     try {
-      const newAdmin: AdminUser = { id: Date.now().toString(), email: newAdminEmail, role: "admin", createdAt: new Date().toISOString() };
-      setAdminUsers([...adminUsers, newAdmin]);
-      setNewAdminEmail(""); setNewAdminPassword(""); setShowAddAdmin(false);
-      toast.success("Compte admin créé !");
-    } catch { toast.error("Erreur lors de la création."); }
-    finally { setLoading(false); }
+      // 🆕 Appel API réel pour créer l'admin
+      const token = localStorage.getItem("authToken");
+      if (!token) {
+        toast.error("Session expirée. Veuillez vous reconnecter.");
+        return;
+      }
+      
+      const response = await apiClient.registerAdmin(newAdminEmail, newAdminPassword, token);
+      
+      // Rafraîchir la liste des admins
+      await fetchAdminUsers();
+      
+      // Réinitialiser le formulaire
+      setNewAdminEmail("");
+      setNewAdminPassword("");
+      setShowAddAdmin(false);
+      
+      toast.success("Compte admin créé avec succès !");
+    } catch (error: any) {
+      console.error('Create admin error:', error);
+      if (error.message?.includes('already exists')) {
+        toast.error("Cet email est déjà utilisé.");
+      } else if (error.message?.includes('403') || error.message?.includes('Forbidden')) {
+        toast.error("Vous n'avez pas les permissions pour créer un admin.");
+      } else {
+        toast.error("Erreur lors de la création du compte admin.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDeleteAdmin = async (id: string) => {
