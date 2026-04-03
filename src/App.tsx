@@ -3,9 +3,11 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Suspense, lazy } from "react";
 import { CartProvider } from "@/context/CartContext";
 import { AuthProvider } from "@/context/AuthContext";
 import Layout from "@/components/Layout";
+import ScrollToTop from "@/components/ScrollToTop";
 import Index from "./pages/Index";
 import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
@@ -16,13 +18,15 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminIndex from "./pages/admin/AdminIndex";
 import AdminLayout from "./pages/admin/AdminLayout";
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import AdminProducts from "./pages/admin/AdminProducts.tsx";
-import AdminOrders from "./pages/admin/AdminOrders";
-import AdminClients from "./pages/admin/AdminClients";
-import AdminPromotions from "./pages/admin/AdminPromotions";
 import AdminProtectedRoute from "@/components/AdminProtectedRoute";
 import NotFound from "./pages/NotFound";
+
+// Lazy loading pour les pages admin
+const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
+const AdminProducts = lazy(() => import("./pages/admin/AdminProducts"));
+const AdminOrders = lazy(() => import("./pages/admin/AdminOrders"));
+const AdminClients = lazy(() => import("./pages/admin/AdminClients"));
+const AdminPromotions = lazy(() => import("./pages/admin/AdminPromotions"));
 
 const queryClient = new QueryClient();
 
@@ -51,11 +55,14 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <ScrollToTop />
             <Routes>
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route path="/admin" element={
                 <AdminProtectedRoute>
-                  <AdminLayout />
+                  <Suspense fallback={<div>Chargement...</div>}>
+                    <AdminLayout />
+                  </Suspense>
                 </AdminProtectedRoute>
               }>
                 <Route path="dashboard" element={<AdminDashboard />} />

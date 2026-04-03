@@ -100,8 +100,8 @@ export default function Index() {
                 src={slide.image}
                 alt={slide.title}
                 className="w-full h-full object-cover"
-                loading="eager"
-                fetchPriority="high"
+                loading={index === 0 ? "eager" : "lazy"}
+                fetchPriority={index === 0 ? "high" : "auto"}
                 width={1200}
                 height={800}
               />
