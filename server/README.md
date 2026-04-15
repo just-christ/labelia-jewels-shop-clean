@@ -13,7 +13,7 @@ npm install
 Edit `.env` file with your MySQL credentials:
 ```
 PORT=5000
-DB_HOST=localhost
+DB_HOST=
 DB_USER=root
 DB_PASSWORD=your_password
 DB_NAME=labelia

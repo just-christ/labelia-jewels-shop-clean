@@ -72,3 +72,18 @@ model Promotion {
   
   @@map("promotions")
 }
+
+model GiftCard {
+  id          String   @id @default(uuid())
+  code        String   @unique // Code unique ex: LABELIA-X7K2P
+  amount      Float    // Montant fixe de la carte
+  percentage  Float?   // Pourcentage de réduction (alternative)
+  isPercentage Boolean  @default(false) // false = montant fixe, true = pourcentage
+  isUsed      Boolean  @default(false) // Si la carte a été utilisée
+  usedAt      DateTime? // Date d'utilisation
+  usedBy      String?  // Email du bénéficiaire qui a utilisé
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("gift_cards")
+}

@@ -10,6 +10,7 @@ import orderRoutes from './routes/order.routes.js';
 import customerRoutes from './routes/customer.routes.js';
 import uploadRoutes from './routes/upload.routes.js';
 import promotionRoutes from './routes/promotion.routes.js';
+import giftCardRoutes from './routes/giftcard.routes.js';
 import path from 'path';
 
 dotenv.config();
@@ -63,6 +64,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/customers', customerRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/promotions', promotionRoutes);
+app.use('/api/giftcards', giftCardRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString(), version: '1.2' });

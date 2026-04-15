@@ -1,26 +1,269 @@
-# Welcome to your Lovable project
+# 🛍️ Labélia - Bijoux minimalistes et élégants
 
-## Project info
+Site e-commerce de bijoux minimalistes avec dashboard administrateur complet, gestion des promotions et cartes cadeaux.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+---
 
-## How can I edit this code?
+## 📋 Table des matières
 
-There are several ways of editing your application.
+- [🚀 Démarrage rapide](#démarrage-rapide)
+- [🏗️ Architecture technique](#architecture-technique)
+- [📦 Structure du projet](#structure-du-projet)
+- [⚙️ Configuration](#configuration)
+- [🔐 Gestion admin](#gestion-admin)
+- [💳 Fonctionnalités](#fonctionnalités)
+- [🌐 Déploiement](#déploiement)
+- [🔧 Maintenance](#maintenance)
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## 🚀 Démarrage rapide
 
-Changes made via Lovable will be committed automatically to this repo.
+### Prérequis
 
-**Use your preferred IDE**
+- Node.js 18+ 
+- npm ou yarn
+- MongoDB (via Prisma)
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Installation
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+```bash
+# Cloner le projet
+git clone [URL_REPO]
+cd labelia-jewels-shop
 
-Follow these steps:
+# Installer les dépendances
+npm install
+
+# Configurer les variables d'environnement
+cp .env.example .env
+# Éditer .env avec vos clés
+
+# Générer Prisma Client
+npx prisma generate
+
+# Démarrer en développement
+npm run dev
+```
+
+### URLs par défaut
+
+- **Frontend** : http://localhost:5173
+- **Backend API** : http://localhost:5000
+- **Admin Dashboard** : http://localhost:5173/admin/login
+
+---
+
+## 🏗️ Architecture technique
+
+### Frontend (React + Vite)
+```
+src/
+├── components/          # Composants réutilisables
+├── context/            # Contexte React (Auth, Cart)
+├── lib/               # Utils et API client
+├── pages/              # Pages du site
+│   ├── admin/         # Dashboard admin
+│   └── ...           # Pages publiques
+└── utils/              # Fonctions utilitaires
+```
+
+### Backend (Node.js + Express + Prisma)
+```
+server/
+├── controllers/        # Logique métier
+├── routes/            # Routes API
+├── middleware/        # Middlewares (auth, etc.)
+├── config/            # Configuration base de données
+└── prisma/           # Schéma de base de données
+```
+
+### Base de données
+
+**Collections principales** :
+- `users` - Utilisateurs et administrateurs
+- `products` - Catalogue produits avec variants
+- `orders` - Commandes clients
+- `promotions` - Codes promo
+- `gift_cards` - Cartes cadeaux
+
+---
+
+## 📦 Structure du projet
+
+```
+labelia-jewels-shop/
+├── public/                 # Fichiers statiques
+│   ├── .htaccess          # Configuration Apache
+│   └── index.html          # HTML principal
+├── src/                    # Code source React
+├── server/                 # Backend Node.js
+├── dist/                   # Build de production
+├── package.json            # Dépendances et scripts
+└── README.md              # Ce fichier
+```
+
+---
+
+## ⚙️ Configuration
+
+### Variables d'environnement (.env)
+
+```env
+# Base de données
+DATABASE_URL="mongodb://localhost:27017/labelia"
+
+# JWT
+JWT_SECRET="votre-secret-super-securise"
+
+# Cloudinary (images)
+CLOUDINARY_CLOUD_NAME="votre-cloud-name"
+CLOUDINARY_API_KEY="votre-api-key"
+CLOUDINARY_API_SECRET="votre-secret"
+
+# Serveur
+PORT=5000
+NODE_ENV=production
+```
+
+### Configuration Cloudinary
+
+1. Créer un compte Cloudinary
+2. Créer un "cloud" pour les images produits
+3. Ajouter les clés dans `.env`
+4. Les images sont automatiquement uploadées via l'admin
+
+---
+
+## 🔐 Gestion admin
+
+### Accès admin
+
+1. **URL** : `/admin/login`
+2. **Identifiants par défaut** :
+   - Email : ``
+   - Mot de passe : ``
+
+> ⚠️ **Important** : Changer les identifiants par défaut en production !
+
+### Fonctionnalités admin
+
+- **📊 Dashboard** : Statistiques en temps réel
+- **📦 Produits** : CRUD complet avec images Cloudinary
+- **📝 Commandes** : Gestion des commandes clients
+- **👥 Clients** : Liste des clients uniques
+- **🎁 Promotions** : Codes promo avec dates
+- **💳 Cartes cadeaux** : Création et suivi
+- **👤 Admins** : Gestion des comptes administrateurs
+
+---
+
+## 💳 Fonctionnalités
+
+### Pour les clients
+
+- **🛒 Panier** : Ajout/modification/suppression
+- **💳 Checkout** : Paiement à la livraison
+- **🎁 Codes promo** : Réduction automatique
+- **💸 Cartes cadeaux** : Usage unique
+- **📱 Responsive** : Mobile-first design
+
+### Pour les administrateurs
+
+- **📈 Statistiques** : Chiffres d'affaires, ventes
+- **🔄 Lazy loading** : Performance optimisée
+- **🖼️ Upload images** : Cloudinary intégré
+- **🔒 Sécurité** : JWT + middleware admin
+
+---
+
+## 🌐 Déploiement
+
+### Build de production
+
+```bash
+# Build frontend
+npm run build
+
+# Lancer en production
+npm start
+```
+
+### Configuration Apache (.htaccess)
+
+Le `.htaccess` inclus configure :
+- **Routing SPA** : Toutes les routes vers index.html
+- **Cache** : Assets avec hash (1 an)
+- **Compression** : Gzip activé
+- **Sécurité** : Headers de sécurité
+
+### Hébergement recommandé
+
+- **Serveur** : Apache avec Node.js
+- **Base de données** : MongoDB Atlas ou local
+- **CDN** : Cloudinary pour les images
+- **Domaine** : HTTPS obligatoire
+
+---
+
+## 🔧 Maintenance
+
+### Mises à jour
+
+```bash
+# Mettre à jour les dépendances
+npm update
+
+# Mettre à jour Prisma
+npx prisma db push
+
+# Redémarrer le serveur
+npm restart
+```
+
+### Sauvegardes
+
+- **Base de données** : Export MongoDB régulier
+- **Images** : Synchronisées via Cloudinary
+- **Code** : Git avec tags de version
+
+### Monitoring
+
+- **Logs** : Console serveur et erreurs client
+- **Performance** : Build Vite optimisé
+- **Sécurité** : Tokens JWT expirent
+
+---
+
+## 📞 Support
+
+### Problèmes courants
+
+| Problème | Solution |
+|-----------|----------|
+| Images ne s'affichent pas | Vérifier Cloudinary keys |
+| Admin inaccessible | Vérifier JWT_SECRET |
+| Panier vide au refresh | Vérifier localStorage |
+| Build échoue | `npx vite build --force` |
+
+### Contact
+
+Pour toute question technique ou besoin d'assistance :
+
+- **Développeur original** : [Coordonnées à ajouter]
+- **Documentation** : Ce README
+- **Issues** : GitHub (si repo public)
+
+---
+
+## 📄 Licence
+
+Ce projet est la propriété de **Labélia**. Toute reproduction ou utilisation sans autorisation est interdite.
+
+---
+
+**Dernière mise à jour** : 15 Avril 2026
+**Version** : 1.2.0
 
 ```sh
 # Step 1: Clone the repository using the project's Git URL.

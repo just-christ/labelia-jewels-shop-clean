@@ -197,6 +197,39 @@ class ApiClient {
       },
     });
   }
+
+  // Gift Cards
+  async createGiftCard(amount: number, percentage: number | null, isPercentage: boolean, token: string) {
+    return this.request('/giftcards', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ amount, percentage, isPercentage }),
+    });
+  }
+
+  async getGiftCards(token: string) {
+    return this.request('/giftcards', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+  }
+
+  async validateGiftCard(code: string) {
+    return this.request(`/giftcards/validate/${code}`, {
+      method: 'GET',
+    });
+  }
+
+  async markGiftCardAsUsed(code: string, email: string) {
+    return this.request('/giftcards/mark-used', {
+      method: 'POST',
+      body: JSON.stringify({ code, email }),
+    });
+  }
 }
 
 export const apiClient = new ApiClient(API_BASE_URL);
