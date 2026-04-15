@@ -250,9 +250,9 @@ npm restart
 
 Pour toute question technique ou besoin d'assistance :
 
-- **Développeur original** : [Coordonnées à ajouter]
+- **Développeur original** : christkouassi.dev@gmail.com 
 - **Documentation** : Ce README
-- **Issues** : GitHub (si repo public)
+- **Issues** : GitHub 
 
 ---
 
@@ -303,14 +303,3 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
